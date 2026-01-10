@@ -5,7 +5,7 @@ import static io.restassured.RestAssured.given;
 import io.restassured.response.Response;
 import pojo.UserLogin;
 
-public class AuthEndpoints {
+public class LoginSendRequest {
 
 	 public static Response login(UserLogin payload) {
 

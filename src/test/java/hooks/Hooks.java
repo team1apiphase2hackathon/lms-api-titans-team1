@@ -1,11 +1,11 @@
 package hooks;
 
 import config.ConfigReader;
-import endpoints.AuthEndpoints;
+import endpoints.LoginSendRequest;
 import io.cucumber.java.Before;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import pojo.UserLogin;
+
 import utils.TestDataUtil;
 
 public class Hooks {

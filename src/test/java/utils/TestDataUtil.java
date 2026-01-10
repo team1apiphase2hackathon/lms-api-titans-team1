@@ -1,7 +1,7 @@
 package utils;
 
 import config.ConfigReader;
-import endpoints.AuthEndpoints;
+import endpoints.LoginSendRequest;
 import pojo.UserLogin;
 
 public class TestDataUtil {
@@ -20,7 +20,7 @@ public class TestDataUtil {
 	                    ConfigReader.get("login.password")
 	            );
 
-	            token = AuthEndpoints.login(validPayload)
+	            token = LoginSendRequest.login(validPayload)
 	                    .then()
 	                    .statusCode(200)
 	                    .extract()
