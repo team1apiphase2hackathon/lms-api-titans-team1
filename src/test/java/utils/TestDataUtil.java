@@ -7,7 +7,17 @@ import pojo.UserLogin;
 public class TestDataUtil {
 
 	 private static String token;
+	  private static String skillName;
+	  
+	  
+	  public static void setSkillName(String name) {
+	        skillName = name;
+	    }
 
+	    public static String getSkillName() {
+	        return skillName;
+	    }
+	    
 
 	    public static synchronized String getToken() {
 
@@ -37,4 +47,9 @@ public class TestDataUtil {
 	        token = null;
 	    }
 	    
+
+
+
+
+
 }
