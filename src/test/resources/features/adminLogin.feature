@@ -1,7 +1,7 @@
 Feature: Verify User Login Controller
 
   @SignInTests @DataDriven
-  Scenario Outline: Verify User Sign In security and validation rules
+  Scenario Outline: Verify User Sign In with No Auth
     Given Admin has the test data for "<ScenarioName>" from Excel with No Auth
     When Admin sends the post request for User Sign In
     Then Admin should receive the status code as defined in Excel
