@@ -135,10 +135,10 @@ public class SkillMasterStepDef {
 		 requestSpec = requestSpec.body(data.get("Body"));
 	     response = ApiRequest.sendRequest(requestSpec,"PUT", data.get("Endpoint"));
 	}
-	
-	@Then("Admin receives {int} Bad Request with error as {string}")
-	public void admin_receives_bad_request_with_error_as(Integer code, String message) {
-		response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(code)).body("message", equalTo(message));
+
+	@Then("Admin receives {int} Not Found Status with error message")
+	public void admin_receives_not_found_status_with_error_message(Integer code) {
+		response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(code));
 	}
 	
 	

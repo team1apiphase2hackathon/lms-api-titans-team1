@@ -9,7 +9,8 @@ import io.cucumber.testng.CucumberOptions;
         tags = "@skill",
         plugin = {
                 "pretty",
-                "html:target/cucumber-report.html"
+                "html:target/cucumber-report.html",
+                "io.qameta.allure.cucumber7jvm.AllureCucumber7Jvm"
         }
 )
 public class TestRunner extends AbstractTestNGCucumberTests{

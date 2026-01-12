@@ -2,5 +2,9 @@
 /.classpath
 /.project
 /.settings/*
-test-output/
+test-output/ 
+allure-results/
+allure-report/
 
+# Mac
+.DS_Store
