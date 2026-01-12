@@ -44,7 +44,7 @@ Given Admin has a valid authorization token
    @put
    Scenario: Check if admin able to update New Skill Master with invalid endpoint and request body
    When Admin sends HTTPS PUT Request and  request Body with mandatory with wrong skillID
-   Then Admin receives 400 Bad Request with error as "Bad Request"
+   Then Admin receives 404 Not Found Status with error message
    
    @delete
    Scenario: Check if admin able to Delete  Skill ID  with valid endpoint 
