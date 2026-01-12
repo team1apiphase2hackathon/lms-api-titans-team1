@@ -3,6 +3,8 @@
 @skill
 Feature: Skill Master
 
+Background:
+Given Admin has a valid authorization token
 
   @post 
   Scenario: Check if admin able to create a New Skill Master with valid endpoint and request body (non existing values)
@@ -51,5 +53,6 @@ Feature: Skill Master
    
    @delete
    Scenario: Check if admin able to Delete  Skill ID  with invalid endpoint 
-   When Admin sends HTTPS DELETE Request 
+   When Admin sends HTTPS DELETE Request invalid skillID
    Then Admin receives 404 Error with response body "no record found with skillId"
+  

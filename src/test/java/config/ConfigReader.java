@@ -13,6 +13,9 @@ public class ConfigReader {
 	                    ConfigReader.class
 	                            .getClassLoader()
 	                            .getResourceAsStream("env.properties");
+	            if (input == null) {
+	                throw new RuntimeException("❌ env.properties not found in src/test/resources");
+	            }
 
 	            properties.load(input);
 
