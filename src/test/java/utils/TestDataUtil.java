@@ -8,7 +8,6 @@ public class TestDataUtil {
 
 	 private static String token;
 
-
 	    public static synchronized String getToken() {
 
 	        if (token == null) {
@@ -37,4 +36,9 @@ public class TestDataUtil {
 	        token = null;
 	    }
 	    
+
+
+
+
+
 }

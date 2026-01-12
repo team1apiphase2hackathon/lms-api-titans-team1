@@ -3,8 +3,10 @@
 @skill
 Feature: Skill Master
 
+Background:
+Given Admin has a valid authorization token
 
-  @post
+  @post 
   Scenario: Check if admin able to create a New Skill Master with valid endpoint and request body (non existing values)
     When Admin sends HTTPS POST Request and  request Body with mandatory 
     Then Admin receives 201 Created Status with response body.    
@@ -12,7 +14,7 @@ Feature: Skill Master
 	 @post
    Scenario: Check if admin able to create a New Skill Master with valid endpoint and request body (existing values)
    When Admin sends HTTPS POST Request and  request Body with mandatory and existing values
-   Then Admin receives 400 Bad Request Status with message cannot create skillMaster , since already exists
+   Then Admin receives 400 Bad Request Status with message "cannot create skillMaster , since already exists"
    
    @post
    Scenario: Check if admin able to create a New Skill Master with valid endpoint and request body (missing some mandatory fields)
@@ -22,7 +24,7 @@ Feature: Skill Master
    @getAll
    Scenario: Check if admin able to get all  Skill Master with valid endpoint 
    When Admin sends HTTPS GET Request 
-   Then Admin receives 200 Status with response body(showing all the list of skills)
+   Then Admin receives 200 Status with response body
    
    @get
    Scenario: Check if admin able to get Skill Master Name with valid endpoint 
@@ -32,7 +34,7 @@ Feature: Skill Master
    @get
    Scenario: Check if admin able to get Skill Master Name with invalid endpoint 
    When Admin sends HTTPS GET Request with invalid SkillMasterName
-   Then Admin receives 404 Not Found Status with message as "skill with idSQLsnot found", success as "false"
+   Then Admin receives 404 Not Found Status with error message and success as "false"
    
    @put
    Scenario: Check if admin able to update New Skill Master with valid endpoint and request body
@@ -51,5 +53,6 @@ Feature: Skill Master
    
    @delete
    Scenario: Check if admin able to Delete  Skill ID  with invalid endpoint 
-   When Admin sends HTTPS DELETE Request 
+   When Admin sends HTTPS DELETE Request invalid skillID
    Then Admin receives 404 Error with response body "no record found with skillId"
+  
