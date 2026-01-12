@@ -1,5 +1,8 @@
 package specs;
+
 import io.restassured.builder.ResponseSpecBuilder;
+import io.restassured.path.json.JsonPath;
+import io.restassured.response.Response;
 import io.restassured.specification.ResponseSpecification;
 
 public class ResponseSpecUtil {
@@ -10,6 +13,16 @@ public class ResponseSpecUtil {
                 .log(io.restassured.filter.log.LogDetail.ALL)
                 .build();
     }
-
-
+	
+	public static String getResponseMessage(Response response) {
+		String contentType = response.getContentType();
+		if ((contentType != null && contentType.contains("application/json"))) {
+			JsonPath json = response.jsonPath();
+			return json.getString("message");
+		}
+		else {
+			return response.asString();
+		}
+	}
+	
 }

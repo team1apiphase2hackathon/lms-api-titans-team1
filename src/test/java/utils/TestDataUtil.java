@@ -2,7 +2,7 @@ package utils;
 
 import config.ConfigReader;
 import endpoints.LoginSendRequest;
-import pojo.UserLogin;
+import requestPojo.UserLogin;
 
 public class TestDataUtil {
 
