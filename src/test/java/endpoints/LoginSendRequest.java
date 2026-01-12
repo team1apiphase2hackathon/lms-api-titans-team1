@@ -3,7 +3,7 @@ package endpoints;
 import static io.restassured.RestAssured.given;
 
 import io.restassured.response.Response;
-import pojo.UserLogin;
+import requestPojo.UserLogin;
 
 public class LoginSendRequest {
 

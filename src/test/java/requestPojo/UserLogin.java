@@ -1,4 +1,4 @@
-package pojo;
+package requestPojo;
 
 public class UserLogin {
 
