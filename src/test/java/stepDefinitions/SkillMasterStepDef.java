@@ -35,27 +35,23 @@ public class SkillMasterStepDef {
 	@When("Admin sends HTTPS POST Request and  request Body with mandatory")
 	public void admin_sends_https_post_request_and_request_body_with_mandatory() throws Exception {
       data = ExcelReader.readExcelData("Skill", "CreateSkill_Valid_NonExistingValues");
-      requestSpec = RequestSpecUtil.getRequestSpec().body(data.get("Body"));
+      requestSpec = requestSpec.body(data.get("Body"));
       response = ApiRequest.sendRequest(requestSpec,"POST", data.get("Endpoint"));
       String skillName =response.jsonPath().getString("skillName");
       ExternalTestDataStore.put("skillName", skillName);
-      System.out.println("Skill stored externally: " + skillName);
       String skillID =response.jsonPath().getString("skillId");
       ExternalTestDataStore.put("skillId", skillID);
-      System.out.println("Skill stored externally: " + skillID);
-      System.out.println("-----------------------------------------------------------------------");
-        
-      
-	}
+   }
 	@Then("Admin receives {int} Created Status with response body.")
 	public void admin_receives_created_status_with_response_body(Integer num) {
-		 response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num));
+		String expectedskillName = ExternalTestDataStore.get("skillName");
+		 response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num)).body("skillName", equalTo(expectedskillName));
 	}
 	
 	@When("Admin sends HTTPS POST Request and  request Body with mandatory and existing values")
 	public void admin_sends_https_post_request_and_request_body_with_mandatory_and_existing_values() throws Exception {
 		 data = ExcelReader.readExcelData("Skill", "CreateSkill_Valid_ExistingValues");   
-		 requestSpec = RequestSpecUtil.getRequestSpec().body(data.get("Body"));
+		 requestSpec = requestSpec.body(data.get("Body"));
 	     response = ApiRequest.sendRequest(requestSpec,"POST", data.get("Endpoint"));
 	}
 	@Then("Admin receives {int} Bad Request Status with message {string}")
@@ -66,7 +62,7 @@ public class SkillMasterStepDef {
 	@When("Admin sends HTTPS POST Request and  request Body with some mandatory fields missing")
 	public void admin_sends_https_post_request_and_request_body_with_some_mandatory_fields_missing() throws Exception {
 		 data = ExcelReader.readExcelData("Skill", "CreateSkill_Valid_MissingValues"); 
-		 requestSpec = RequestSpecUtil.getRequestSpec().body(data.get("Body"));
+		 requestSpec = requestSpec.body(data.get("Body"));
 		  response = ApiRequest.sendRequest(requestSpec,"POST", data.get("Endpoint"));
 	}
 	@Then("Admin receives {int} Error")
@@ -90,10 +86,7 @@ public class SkillMasterStepDef {
 	public void admin_sends_https_get_request_with_skill_master_name() throws Exception {
 		 data = ExcelReader.readExcelData("Skill", "GetSkill_Valid");  
 		 String skillName = ExternalTestDataStore.get("skillName");
-		 System.out.println(skillName);
-		 System.out.println("-----------------------------------------------------------------------");
-		 
-		 if (skillName == null) {
+		if (skillName == null) {
 			        throw new IllegalStateException("Skill name not found in external store");
 			    }
 		 String endpoint = data.get("Endpoint").replace("{skillMasterName}", skillName);
@@ -120,23 +113,32 @@ public class SkillMasterStepDef {
 	//PUT REQUEST
 	
 	@When("Admin sends HTTPS PUT Request and  request Body with mandatory")
-	public void admin_sends_https_put_request_and_request_body_with_mandatory() {
-	  
+	public void admin_sends_https_put_request_and_request_body_with_mandatory() throws Exception {
+		 data = ExcelReader.readExcelData("Skill", "UpdateSkill_Valid");   
+		 requestSpec = requestSpec.body(data.get("Body"));
+		 String skillId = ExternalTestDataStore.get("skillId");
+		 String endpoint = data.get("Endpoint").replace("{skillId}", skillId);
+	     response = ApiRequest.sendRequest(requestSpec,"PUT",endpoint);
+	     String updatedskillName =response.jsonPath().getString("skillName");
+	      ExternalTestDataStore.put("updatedskillName", updatedskillName);
 	}
 	
 	@Then("Admin receives {int} Status with updated response body.")
-	public void admin_receives_status_with_updated_response_body(Integer int1) {
-	 
+	public void admin_receives_status_with_updated_response_body(Integer num) {
+		String expectedSkillName = ExternalTestDataStore.get("updatedskillName");
+		response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num)).body("skillName", equalTo(expectedSkillName));
 	}
 
 	@When("Admin sends HTTPS PUT Request and  request Body with mandatory with wrong skillID")
-	public void admin_sends_https_put_request_and_request_body_with_mandatory_with_wrong_skill_id() {
-	  
+	public void admin_sends_https_put_request_and_request_body_with_mandatory_with_wrong_skill_id() throws Exception {
+		 data = ExcelReader.readExcelData("Skill", "UpdateSkill_InValid");   
+		 requestSpec = requestSpec.body(data.get("Body"));
+	     response = ApiRequest.sendRequest(requestSpec,"PUT", data.get("Endpoint"));
 	}
 	
 	@Then("Admin receives {int} Bad Request with error as {string}")
-	public void admin_receives_bad_request_with_error_as(Integer int1, String string) {
-	
+	public void admin_receives_bad_request_with_error_as(Integer code, String message) {
+		response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(code)).body("message", equalTo(message));
 	}
 	
 	
@@ -146,13 +148,10 @@ public class SkillMasterStepDef {
 	public void admin_sends_https_delete_request() throws Exception {
 		 data = ExcelReader.readExcelData("Skill", "DeleteSkill_Valid");   
 		 String skillID = ExternalTestDataStore.get("skillId");
-		 System.out.println(skillID);
-		 System.out.println("---------------------------------------------------------");
 		 if (skillID == null) {
 			        throw new IllegalStateException("Skill name not found in external store");
 			    }
 		 String endpoint = data.get("Endpoint").replace("{skillId}", skillID);
-		 System.out.println(endpoint);
 		 response = ApiRequest.sendRequest(requestSpec,"DELETE",endpoint);
 	}
 	
