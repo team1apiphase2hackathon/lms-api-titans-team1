@@ -9,11 +9,11 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.testng.Assert;
 import requestPojo.ProgramRequest;
 import responsePojo.ProgramResponse;
 import specs.RequestSpecUtil;
 import utils.ExcelReader;
-import utils.ScenarioContext;
 
 import static io.restassured.RestAssured.*;
 
@@ -24,46 +24,87 @@ public class ProgramStepDef {
     private Map<String, String> data;
     private Response response;
     private static ProgramRequest programInput;
-    ScenarioContext scenarioContext;
-
-    @Given("Admin sends POST request to create program for LMS")
-    public void admin_sends_post_request_to_create_program_for_lms() {
-
-    }
-
-    @When("Admin create POST request with request body")
-    public void admin_create_post_request_with_request_body() {
-
-    }
-
-    @Then("Admin receives {int} created status code with response body")
-    public void admin_receives_created_status_code_with_response_body(Integer int1) {
-
-    }
 
 
     @Given("Admin has a valid authorization token set")
     public void admin_has_a_valid_authorization_token_set() {
         requestSpec = RequestSpecUtil.getRequestSpec();
     }
-    @When("Admin sends POST request to create program with different payload for <{string}> from dataSheet")
-    public void admin_sends_post_request_to_create_program_with_different_payload_for_from_data_sheet(String testcaseName) throws IOException {
-         data = ExcelReader.readExcelData("Program", testcaseName);
-         programInput = ProgramSendRequest.createProgramParseData(data.get("body"));
-         requestSpec= given().spec(requestSpec)
-                 .basePath(data.get("Endpoint"))
-                 .body(programInput);
-        // String ProgramDescription  = programInput.getProgramDescription();
+    @When("Admin sends POST request to create program with different payload for {string} from dataSheet")
+    public void admin_sends_post_request_to_create_program_with_different_payload_for_from_data_sheet(String scenarioNameFromFeature) throws IOException {
 
+        data = ExcelReader.readExcelData("Program", scenarioNameFromFeature);
+
+        if (data != null) {
+            String dataSheetTestname = data.get("ScenarioName");
+
+            if (scenarioNameFromFeature.equalsIgnoreCase(dataSheetTestname)) {
+
+                programInput = ProgramSendRequest.createProgramParseData(data.get("Body"));
+
+                requestSpec = given()
+                        .spec(requestSpec)
+                        .body(programInput);
+
+                String httpMethod = data.get("Method");
+                String endPoint = data.get("Endpoint");
+
+                response = requestSpec.
+                        when().
+                        request(httpMethod, endPoint).
+                        then().log().all().extract().response();
+            }
+        } else {
+            throw new RuntimeException("Test data not found for: " + scenarioNameFromFeature);
+        }
     }
-
     @Then("Admin verifies the response payload with expected output from the data sheet")
     public void admin_verifies_the_response_payload_with_expected_output_from_the_data_sheet() {
 
-//        response = requestSpec.when().post().then().log().all().extract().response();;
-//        int expectedStatus = Integer.parseInt(data.get("ExpectedStatusCode"));
-//        response.then().statusCode(expectedStatus).log().ifValidationFails();
-//        ProgramResponse batchResponse = response.as(ProgramResponse.class);
+           int expectedStatus = Integer.parseInt(data.get("ExpectedStatusCode"));
+            response.then().statusCode(expectedStatus);
+            if(expectedStatus ==201){
+                ProgramResponse actualResponse = response.as(ProgramResponse.class);
+
+                String desc = actualResponse.getProgramDescription();
+                String name  = actualResponse.getProgramName();
+                int id = actualResponse.getProgramId();
+                System.out.println("program Description : " + desc);
+                System.out.println("program Name : " + name);
+                System.out.println("Id : " + id);
+
+
+                Assert.assertEquals(actualResponse.getProgramDescription(),programInput.getProgramDescription(), "ProgramDescription is not matching");
+                Assert.assertEquals(actualResponse.getProgramName(),programInput.getProgramName(),"ProgramName is not matching");
+                int createdProgramId = actualResponse.getProgramId();
+                Assert.assertTrue(createdProgramId > 0,  "ProgramId should not be negative value");
+            }
+            else {
+                switch (expectedStatus) {
+
+                    case 400:
+                        System.out.println("Response code received from actual response after execution: "+response.getStatusCode());
+                        String badReq = response.jsonPath().getString("message");
+                    Assert.assertNotNull(badReq, "Bad request ");
+                    break;
+                    case 404:
+                        System.out.println("Response code received from actual response after execution: "+response.getStatusCode());
+                        System.out.println("Endpoint not found as expected.");
+                        break;
+                    case 405:
+                        System.out.println("Response code received from actual response after execution: "+response.getStatusCode());
+                        String methodNotAllowed = response.jsonPath().getString("error");
+                        Assert.assertEquals(methodNotAllowed, "Method Not Allowed");
+                        break;
+                    default:
+                        System.out.println("Response code received from actual response after execution: "+response.getStatusCode());
+                        System.out.println("Generic status: " + expectedStatus);
+                        break;
+
+                }
+
+            }
+
 
     }
 
