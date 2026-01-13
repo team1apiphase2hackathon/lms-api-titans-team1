@@ -6,5 +6,7 @@ test-output/
 allure-results/
 allure-report/
 
+.idea/
+
 # Mac
 .DS_Store
