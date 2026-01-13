@@ -1,19 +1,19 @@
 package responsePojo;
 
 public class ProgramBatchResponse {
-	private double batchId;
+	private int batchId;
 	private String batchDescription;
 	private String batchName;
 	private int batchNoOfClasses;
 	private String batchStatus;
-	private double programId;
+	private int programId;
 	private String programName;
 	
-	public double getBatchId() {
+	public int getBatchId() {
 		return batchId;
 	}
 	
-	public void setBatchId(double batchId) {
+	public void setBatchId(int batchId) {
 		this.batchId = batchId;
 	}
 	
@@ -52,7 +52,7 @@ public class ProgramBatchResponse {
 		return programId;
 	}
 	
-	public void setProgramId(double programId) {
+	public void setProgramId(int programId) {
 		this.programId = programId;
 	}
 	
