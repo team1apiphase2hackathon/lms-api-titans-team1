@@ -7,7 +7,6 @@ import static io.restassured.RestAssured.*;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import specs.RequestSpecUtil;
@@ -72,6 +71,73 @@ public class AdminLoginStepDef {
 		int actual = response.getStatusCode();
 
 		Assert.assertEquals(actual, expected, "Status Code Mismatch! Expected " + expected + " but got " + actual);
+	}
+
+	@When("Admin sends the post request for ForgotPassword")
+	public void admin_sends_the_post_request_for_forgot_password() {
+		String endpoint = testData.get("Endpoint");
+		if (testData.get("ScenarioName").contains("ForgotPassword_InvalidContentType")) {
+			requestSpec.contentType("text/plain");
+		}
+		response = requestSpec.when().post(endpoint);
+	}
+
+	@Then("the response should match the expected validation message")
+	public void the_response_should_match_the_expected_validation_message() {
+		String expectedMsg = testData.get("Expectedmessage");
+		String actualBody = response.getBody().asString();
+		Assert.assertTrue(actualBody.contains(expectedMsg),
+				"\nExpected to find: [" + expectedMsg + "] \nBut returned: [" + actualBody + "]");
+	}
+
+	@Given("Admin has the test data for {string} from Excel with Bearer Token")
+	public void admin_has_the_test_data_for_from_excel_with_bearer_token(String scenarioName) throws IOException {
+		testData = ExcelReader.readExcelData("AdminLogin", scenarioName);
+
+		requestSpec = given().spec(RequestSpecUtil.getRequestSpec().body(testData.get("Body")));
+	}
+
+	@When("Admin sends a POST request with Authorization for ResetPassword")
+	public void admin_sends_a_post_request_with_authorization_for_reset_password() {
+		String endpoint = testData.get("Endpoint");
+		if (testData.get("ScenarioName").contains("ResetPassword_InvalidContentType")) {
+			requestSpec.contentType("text/plain");
+		}
+		response = requestSpec.when().post(endpoint);
+	}
+
+	@When("Admin sends the post request for ResetPasswordNoAuth")
+	public void admin_sends_the_post_request_for_reset_password_no_auth() {
+		String endpoint = testData.get("Endpoint");
+		response = requestSpec.when().post(endpoint);
+
+	}
+
+	@When("Admin sends a GET request for Reset Password ResetPasswordInvalidMethod")
+	public void admin_sends_a_get_request_for_reset_password_reset_password_invalid_method() {
+		String endpoint = testData.get("Endpoint");
+		response = requestSpec.when().get(endpoint);
+	}
+
+	@When("Admin sends a GET request for Logout")
+	public void admin_sends_a_get_request_for_logout() {
+		String endpoint = testData.get("Endpoint");
+
+		response = requestSpec.when().get(endpoint);
+
+	}
+
+	@When("Admin sends a POST request instead of GET for logoutInvalidMethod")
+	public void admin_sends_a_post_request_instead_of_get_for_logout_invalid_method() {
+		String endpoint = testData.get("Endpoint");
+		response = requestSpec.when().post(endpoint);
+	}
+
+	@When("Admin sends a GET request for Logout noauth")
+	public void admin_sends_a_get_request_for_logout_noauth() {
+		String endpoint = testData.get("Endpoint");
+		response = requestSpec.when().get(endpoint);
+
 	}
 
 }
