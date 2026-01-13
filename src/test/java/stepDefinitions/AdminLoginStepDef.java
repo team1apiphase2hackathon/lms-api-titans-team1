@@ -10,6 +10,7 @@ import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import specs.RequestSpecUtil;
+import specs.ResponseSpecUtil;
 import utils.ExcelReader;
 import utils.TestDataUtil;
 
@@ -22,7 +23,7 @@ public class AdminLoginStepDef {
 	@Given("Admin has the test data for {string} from Excel with No Auth")
 	public void admin_has_the_test_data_for_from_excel_with_no_auth(String scenarioName) throws IOException {
 		testData = ExcelReader.readExcelData("AdminLogin", scenarioName);
-
+		RequestSpecUtil.logScenarioName(scenarioName);
 		requestSpec = given().spec(RequestSpecUtil.getRequestSpecWithoutAuth()).body(testData.get("Body"));
 	}
 
@@ -39,8 +40,8 @@ public class AdminLoginStepDef {
 	public void admin_should_receive_the_status_code_as_defined_in_excel() {
 		int expectedStatusCode = Integer.parseInt(testData.get("ExpectedStatusCode"));
 
-		response.then().log().all().statusCode(expectedStatusCode);
-
+		//response.then().log().all().statusCode(expectedStatusCode);
+		response.then().spec(ResponseSpecUtil.status(expectedStatusCode));
 		if (response.getStatusCode() == 200) {
 			String capturedToken = response.jsonPath().getString("token");
 			if (capturedToken != null) {
@@ -50,6 +51,7 @@ public class AdminLoginStepDef {
 
 	}
 
+
 	@Then("the response should match the expected validation message from Excel")
 	public void the_response_should_match_the_expected_validation_message_from_excel() {
 		String expectedMsg = testData.get("Expectedmessage");
@@ -57,6 +59,13 @@ public class AdminLoginStepDef {
 		Assert.assertTrue(actualBody.contains(expectedMsg),
 				"\nExpected to find: [" + expectedMsg + "] \nBut returned: [" + actualBody + "]");
 	}
+	@Given("Admin has the test data for {string} from Excel with Bearer Token")
+	public void admin_has_the_test_data_for_from_excel_with_bearer_token(String scenarioName) throws IOException {
+		testData = ExcelReader.readExcelData("AdminLogin", scenarioName);
+
+		requestSpec = given().spec(RequestSpecUtil.getRequestSpec().body(testData.get("Body")));
+	}
+
 
 	@When("Admin sends a GET request instead of POST for SignIn InvalidMethod")
 	public void admin_sends_a_get_request_instead_of_post_for_sign_in_invalid_method() {
@@ -90,13 +99,7 @@ public class AdminLoginStepDef {
 				"\nExpected to find: [" + expectedMsg + "] \nBut returned: [" + actualBody + "]");
 	}
 
-	@Given("Admin has the test data for {string} from Excel with Bearer Token")
-	public void admin_has_the_test_data_for_from_excel_with_bearer_token(String scenarioName) throws IOException {
-		testData = ExcelReader.readExcelData("AdminLogin", scenarioName);
-
-		requestSpec = given().spec(RequestSpecUtil.getRequestSpec().body(testData.get("Body")));
-	}
-
+	
 	@When("Admin sends a POST request with Authorization for ResetPassword")
 	public void admin_sends_a_post_request_with_authorization_for_reset_password() {
 		String endpoint = testData.get("Endpoint");

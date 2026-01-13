@@ -20,7 +20,7 @@ Feature: Verify User Login Controller
       | Postrequest_NullPassword         |
       | Postrequest_NullEmail            |
       | Postrequest_NullBody             |
-#
+
   #@POSTInvalidMethod
   #Scenario: Verify login with Invalid Method
     #Given Admin has the test data for "Postrequest_Invalidmethod" from Excel with No Auth
