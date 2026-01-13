@@ -8,9 +8,8 @@ import org.hamcrest.Matchers;
 import org.hamcrest.core.Every;
 import org.testng.Assert;
 
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import endpoints.ProgramBatchUtil;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -35,6 +34,8 @@ public class ProgramBatchStepDef extends GlobalTestData{
 	public ProgramBatchStepDef(ScenarioContext scenarioContext) {
 		this.scenarioContext = scenarioContext;
 	}
+	
+	//Create Batch
 	@Given("Admin create POST request with valid {string} format and {string}")
 	public void admin_create_post_request_with_valid_format_and(String batch_name, String batch_description) throws IOException {
 		data = ExcelReader.readExcelData("Batch", "CreateBatch_Valid_Request");
@@ -57,7 +58,10 @@ public class ProgramBatchStepDef extends GlobalTestData{
 
 	@Then("Admin receives created status with response body")
 	public void admin_receives_created_status_with_response_body()  {
-		response.then().log().all().statusCode(Integer.parseInt(data.get("ExpectedStatusCode")));
+		response.then().log().all()
+					.statusCode(Integer.parseInt(data.get("ExpectedStatusCode")))
+					.body(matchesJsonSchemaInClasspath("schemas/batch/CreateBatchResponseSchema.json"));
+		
 		ProgramBatchResponse batchResponse = response.as(ProgramBatchResponse.class);
 		if (batchIds.size() == 0) {
 			batchId = batchResponse.getBatchId();
@@ -142,6 +146,7 @@ public class ProgramBatchStepDef extends GlobalTestData{
                 .body(data.get("Body")); 
 	}
 
+	//Get ALL Batches
 	@Given("Admin create GET request with valid endpoint")
 	public void admin_create_get_request_with_valid_endpoint() throws IOException {
 		data = ExcelReader.readExcelData("Batch", "GetALLBatches_Valid");
@@ -161,6 +166,7 @@ public class ProgramBatchStepDef extends GlobalTestData{
 		int batchIdCount = 0;
 		response.then().log().all()
 			.statusCode(expectedStatusCode)
+			.body(matchesJsonSchemaInClasspath("schemas/batch/GetAllBatchesResponseSchema.json"))
 			.body("", Matchers.instanceOf(List.class))
 			.body("size()", Matchers.greaterThan(0));
 		JsonPath json = response.jsonPath();
@@ -191,6 +197,7 @@ public class ProgramBatchStepDef extends GlobalTestData{
                 .basePath(data.get("Endpoint"));
 	}
 	
+	//Get Batch by batchId
 	@Given("Admin create GET request with valid batchId")
 	public void admin_create_get_request_with_valid_batch_id() throws IOException {
 		data = ExcelReader.readExcelData("Batch", "GetBatchById_Valid_BatchId");
@@ -208,7 +215,9 @@ public class ProgramBatchStepDef extends GlobalTestData{
 	@Then("Admin receives success code with GET response body")
 	public void admin_receives_success_code_with_get_response_body() {
 		int expectedStatusCode = Integer.parseInt(data.get("ExpectedStatusCode"));
-		response.then().log().all().statusCode(expectedStatusCode);
+		response.then().log().all()
+				.statusCode(expectedStatusCode)
+				.body(matchesJsonSchemaInClasspath("schemas/batch/GetBatchByIdResponseSchema.json"));
 		JsonPath json = response.jsonPath();
 		Assert.assertEquals(json.getInt("batchId"), batchId, "Batch Id doesn't match");
 	}
@@ -240,6 +249,7 @@ public class ProgramBatchStepDef extends GlobalTestData{
                 .basePath(data.get("Endpoint"));
 	}
 	
+	//Get Batch By Batch Name
 	@Given("Admin create GET request to retrieve batch with valid batch name")
 	public void admin_create_get_request_to_retrieve_batch_with_valid_batch_name() throws IOException {
 		data = ExcelReader.readExcelData("Batch", "GetBatchByName_Valid_BatchName");
@@ -252,7 +262,9 @@ public class ProgramBatchStepDef extends GlobalTestData{
 	@Then("Admin receives success code with GET response body having given batch name")
 	public void admin_receives_success_code_with_get_response_body_having_given_batch_name() {
 		int expectedStatusCode = Integer.parseInt(data.get("ExpectedStatusCode"));
-		response.then().log().all().statusCode(expectedStatusCode);
+		response.then().log().all()
+				.statusCode(expectedStatusCode)
+				.body(matchesJsonSchemaInClasspath("schemas/batch/GetBatchByNameResponseSchema.json"));
 		JsonPath json = response.jsonPath();
 		Assert.assertEquals(json.getString("batchName"), batchName, "Batch Name doesn't match");
 	}
@@ -284,6 +296,7 @@ public class ProgramBatchStepDef extends GlobalTestData{
                 .basePath(data.get("Endpoint"));
 	}
 	
+	//Get Batch By ProgramId
 	@Given("Admin create GET request to retrieve batch with valid programId")
 	public void admin_create_get_request_to_retrieve_batch_with_valid_program_id() throws IOException {
 		data = ExcelReader.readExcelData("Batch", "GetBatchByProgram_Valid_ProgramId");
@@ -298,6 +311,7 @@ public class ProgramBatchStepDef extends GlobalTestData{
 		int expectedStatusCode = Integer.parseInt(data.get("ExpectedStatusCode"));
 		response.then().log().all()
 				.statusCode(expectedStatusCode)
+				.body(matchesJsonSchemaInClasspath("schemas/batch/GetBatchByProgramResponseSchema.json"))
 				.body("", Matchers.instanceOf(List.class))
 				.body("size()", Matchers.greaterThan(0))
 				.body("programId", Every.everyItem(Matchers.equalTo(programId)));		
