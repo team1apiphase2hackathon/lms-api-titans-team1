@@ -1,5 +1,4 @@
 package specs;
-
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
@@ -10,7 +9,6 @@ public class ResponseSpecUtil {
     public static ResponseSpecification status(Integer code) {
         return new ResponseSpecBuilder()
                 .expectStatusCode(code)
-                .log(io.restassured.filter.log.LogDetail.ALL)
                 .build();
     }
 	
