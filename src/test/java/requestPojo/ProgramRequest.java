@@ -1,10 +1,15 @@
 package requestPojo;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class ProgramRequest {
 
+    @JsonProperty("programDescription")
     private String programDescription;
+    @JsonProperty("programName")
     private String programName;
-    private String status;
+    @JsonProperty("programStatus")
+    private String programStatus;
 
     public void setProgramName(String programName) {
         this.programName = programName;
@@ -21,12 +26,12 @@ public class ProgramRequest {
         return programDescription;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setprogramStatus(String programStatus) {
+        this.programStatus = programStatus;
     }
 
-    public String getStatus() {
-        return status;
+    public String getprogramStatus() {
+        return programStatus;
     }
 
 
