@@ -9,15 +9,17 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.testng.Assert;
 import requestPojo.ProgramRequest;
 import responsePojo.ProgramResponse;
 import specs.RequestSpecUtil;
 import utils.ExcelReader;
+import utils.GlobalTestData;
 
 import static io.restassured.RestAssured.*;
 
-public class ProgramStepDef {
+public class ProgramStepDef extends GlobalTestData {
 
 
     private static RequestSpecification requestSpec;
@@ -61,86 +63,191 @@ public class ProgramStepDef {
     @Then("Admin verifies the response payload with expected output from the data sheet")
     public void admin_verifies_the_response_payload_with_expected_output_from_the_data_sheet() {
 
-           int expectedStatus = Integer.parseInt(data.get("ExpectedStatusCode"));
-            response.then().statusCode(expectedStatus);
-            if(expectedStatus ==201){
-                ProgramResponse actualResponse = response.as(ProgramResponse.class);
+        int expectedStatus = Integer.parseInt(data.get("ExpectedStatusCode"));
+        response.then().statusCode(expectedStatus);
+        if(expectedStatus ==201){
+            ProgramResponse actualResponse = response.as(ProgramResponse.class);
 
-                String desc = actualResponse.getProgramDescription();
-                String name  = actualResponse.getProgramName();
-                int id = actualResponse.getProgramId();
-                System.out.println("program Description : " + desc);
-                System.out.println("program Name : " + name);
-                System.out.println("Id : " + id);
+            String desc = actualResponse.getProgramDescription();
+            String name  = actualResponse.getProgramName();
+            int generatedId = actualResponse.getProgramId();
+            GlobalTestData.programId = generatedId;
+            System.out.println("Saved Program ID to GlobalTestData: " + GlobalTestData.programId);
+            System.out.println("program Description : " + desc);
+            System.out.println("program Name : " + name);
 
+            Assert.assertEquals(actualResponse.getProgramDescription(),programInput.getProgramDescription(), "ProgramDescription is not matching");
+            Assert.assertEquals(actualResponse.getProgramName(),programInput.getProgramName(),"ProgramName is not matching");
+            int createdProgramId = actualResponse.getProgramId();
+            Assert.assertTrue(createdProgramId > 0,  "ProgramId should not be negative value");
+        }
+        else {
+            switch (expectedStatus) {
 
-                Assert.assertEquals(actualResponse.getProgramDescription(),programInput.getProgramDescription(), "ProgramDescription is not matching");
-                Assert.assertEquals(actualResponse.getProgramName(),programInput.getProgramName(),"ProgramName is not matching");
-                int createdProgramId = actualResponse.getProgramId();
-                Assert.assertTrue(createdProgramId > 0,  "ProgramId should not be negative value");
-            }
-            else {
-                switch (expectedStatus) {
-
-                    case 400:
-                        System.out.println("Response code received from actual response after execution: "+response.getStatusCode());
-                        String badReq = response.jsonPath().getString("message");
+                case 400:
+                    System.out.println("Response code received from actual response after execution: "+response.getStatusCode());
+                    String badReq = response.jsonPath().getString("message");
                     Assert.assertNotNull(badReq, "Bad request ");
                     break;
-                    case 404:
-                        System.out.println("Response code received from actual response after execution: "+response.getStatusCode());
-                        System.out.println("Endpoint not found as expected.");
-                        break;
-                    case 405:
-                        System.out.println("Response code received from actual response after execution: "+response.getStatusCode());
-                        String methodNotAllowed = response.jsonPath().getString("error");
-                        Assert.assertEquals(methodNotAllowed, "Method Not Allowed");
-                        break;
-                    default:
-                        System.out.println("Response code received from actual response after execution: "+response.getStatusCode());
-                        System.out.println("Generic status: " + expectedStatus);
-                        break;
-
-                }
+                case 404:
+                    System.out.println("Response code received from actual response after execution: "+response.getStatusCode());
+                    System.out.println("Endpoint not found as expected.");
+                    break;
+                case 405:
+                    System.out.println("Response code received from actual response after execution: "+response.getStatusCode());
+                    String methodNotAllowed = response.jsonPath().getString("error");
+                    Assert.assertEquals(methodNotAllowed, "Method Not Allowed");
+                    break;
+                default:
+                    System.out.println("Response code received from actual response after execution: "+response.getStatusCode());
+                    System.out.println("Generic status: " + expectedStatus);
+                    break;
 
             }
 
+        }
+
 
     }
 
+    @When("Admin sends GET request to get program with different payload for {string} from dataSheet")
+    public void admin_sends_get_request_to_get_program_with_different_payload_for_from_data_sheet( String scenarioNameFromFeature) throws IOException {
+        String scenario = scenarioNameFromFeature;
+        System.out.println(scenario);
+        data = ExcelReader.readExcelData("Program", scenario);
 
-    @When("Admin sends GET request to get program with different payload for <{string}> from dataSheet")
-    public void admin_sends_get_request_to_get_program_with_different_payload_for_from_data_sheet(String string) {
+       // data = ExcelReader.readExcelData("Program", scenario);
 
+        if (data != null) {
+            String dataSheetTestname = data.get("ScenarioName");
+
+
+            if (scenario.equalsIgnoreCase(dataSheetTestname)) {
+
+                requestSpec = given()
+                        .spec(requestSpec);
+
+                String httpMethod = data.get("Method");
+                String endPoint = data.get("Endpoint");
+                if (endPoint.contains("{programId}")) {
+                    endPoint = endPoint.replace("{programId}", String.valueOf(GlobalTestData.programId));
+                }
+                response = requestSpec.
+                        when().
+                        request(httpMethod, endPoint).
+                        then().log().all().extract().response();
+
+            }
+        } else {
+            throw new RuntimeException("Test data not found for: " + scenario);
+        }
     }
+
 
     @Then("Admin verifies the response payload with expected output from the data sheet for Get Program")
     public void admin_verifies_the_response_payload_with_expected_output_from_the_data_sheet_for_get_program() {
-
+        int expectedStatus = Integer.parseInt(data.get("ExpectedStatusCode"));
+        String expectedMessage = data.get("ExpectedMessage");
+        response.then().statusCode(expectedStatus);
+        if (expectedStatus == 200) {
+            // Assert that the ID in the response matches what we stored
+            int actualId = response.jsonPath().getInt("programId");
+            Assert.assertEquals(actualId, GlobalTestData.programId);
+        }
+        else if (expectedStatus == 404) {
+            String actualMessage = response.jsonPath().getString("errorMessage");
+            response.then().statusLine(org.hamcrest.Matchers.containsString(expectedMessage));
+            System.out.println("Verified 404: Received expected error message.");
+        }
     }
 
-    @When("Admin sends GET request to get all programs with different payload for <{string}> from dataSheet")
-    public void admin_sends_get_request_to_get_all_programs_with_different_payload_for_from_data_sheet(String string) {
+    @When("Admin sends GET request to get all programs with different payload for {string} from dataSheet")
+    public void admin_sends_get_request_to_get_all_programs_with_different_payload_for_from_data_sheet(@NonNull String scenarioNameFromFeature) throws IOException {
 
+        String scenarioName = scenarioNameFromFeature;
+        data = ExcelReader.readExcelData("Program", scenarioName);
+
+        if (data != null) {
+            String dataSheetTestname = data.get("ScenarioName");
+
+            if (scenarioNameFromFeature.equalsIgnoreCase(dataSheetTestname)) {
+                requestSpec = given()
+                        .spec(requestSpec);
+
+                String httpMethod = data.get("Method");
+                String endPoint = data.get("Endpoint");
+
+                response = requestSpec.
+                        when().
+                        request(httpMethod, endPoint).
+                        then().log().all().extract().response();
+
+            }
+        }else {
+            throw new RuntimeException("Test data not found for: " + scenarioNameFromFeature);
+        }
     }
 
     @Then("Admin verifies the response payload with expected output from the data sheet for Get All Programs")
     public void admin_verifies_the_response_payload_with_expected_output_from_the_data_sheet_for_get_all_programs() {
+        int expectedStatus = Integer.parseInt(data.get("ExpectedStatusCode"));
+        String expectedMessage = data.get("ExpectedMessage");
+
+        response.then()
+                .statusCode(expectedStatus)
+                .statusLine(org.hamcrest.Matchers.containsString(expectedMessage));
+
+        if (expectedStatus == 200) {
+            response.then().body("programId", org.hamcrest.Matchers.equalTo(GlobalTestData.programId));
+            System.out.println("Verified 200 OK: Program ID matches.");
+        }
+        else {
+            System.out.println("Verified " + expectedStatus + ": Received expected error message.");
+        }
 
     }
 
-    @When("Admin sends PUT request to update programById with payload for <{string}> using dataSheet")
-    public void admin_sends_put_request_to_update_program_by_id_with_payload_for_using_data_sheet(String string) {
+    @When("Admin sends PUT request to update programById with payload for {string} using dataSheet")
+    public void admin_sends_put_request_to_update_program_by_id_with_payload_for_using_data_sheet(String scenario) throws IOException {
+        String scenarioName = scenario;
+        System.out.println(scenarioName);
+        if (data != null) {
+            String dataSheetTestname = data.get("ScenarioName");
 
+            if (scenarioName.equalsIgnoreCase(dataSheetTestname)) {
+
+                programInput = ProgramSendRequest.createProgramParseData(data.get("Body"));
+
+                requestSpec = given()
+                        .spec(requestSpec)
+                        .body(programInput);
+
+                String httpMethod = data.get("Method");
+                String endPoint = data.get("Endpoint");
+                if (endPoint.contains("{programId}")) {
+                    endPoint = endPoint.replace("{programId}", String.valueOf(GlobalTestData.programId));
+                }
+                response = requestSpec.
+                        when().
+                        request(httpMethod, endPoint).
+                        then().log().all().extract().response();
+
+            }
+        }
     }
 
     @Then("Admin verifies the response payload with expected output from the data sheet for Update Program ByProgramId")
     public void admin_verifies_the_response_payload_with_expected_output_from_the_data_sheet_for_update_program_by_program_id() {
 
+
     }
 
     @When("Admin sends PUT request to update programByName with payload for <{string}> using dataSheet")
-    public void admin_sends_put_request_to_update_program_by_name_with_payload_for_using_data_sheet(String string) {
+    public void admin_sends_put_request_to_update_program_by_name_with_payload_for_using_data_sheet(String scenario) throws IOException {
+        String scenarioName = scenario;
+        System.out.println(scenarioName);
+        data = ExcelReader.readExcelData("Program", scenarioName);
+        int programId = GlobalTestData.programId;
 
     }
 
