@@ -24,8 +24,7 @@ Feature: Verify User Login Controller
       | Postrequest_CaseSensitivePassword|
       | Postrequest_CaseSensitiveEmail   |
       
-      
-  
+ 
 
   #@POSTInvalidMethod
   #Scenario: Verify login with Invalid Method

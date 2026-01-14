@@ -110,7 +110,6 @@ public class LoginControllerStepDef extends GlobalTestData {
 		if (response.getStatusCode() == 200 && scenario.contains("Valid")) {
 			response.then().assertThat()
 					.body(matchesJsonSchemaInClasspath("schemas/Login/PostForgotPasswordResponseSchema.json"));
-			System.out.println("✅ Forgot Password Schema Validated");
 		}
 	}
 
