@@ -8,6 +8,13 @@ public class GlobalTestData {
 	protected static int batchId = 70;
 	protected static String batchName = "Batch01";
 	protected static int programId = 70;
+	protected static String skillId;
+    protected static String skillName;
+	protected static String userId;
+	protected static String AdminUserId;
+	protected static String StaffUserId;
+	protected static String StudentUserId;
+	
 	
 	public GlobalTestData() {
 		

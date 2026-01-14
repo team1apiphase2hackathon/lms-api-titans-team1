@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "skillId": {
+        "type": "integer"
+      },
+      "skillName": {
+        "type": "string"
+      },
+      "creationTime": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "lastModTime": {
+        "type": "string",
+        "format": "date-time"
+      }
+    },
+    "required": [
+      "skillId",
+      "skillName",
+      "creationTime",
+      "lastModTime"
+    ]
+  }
+}
