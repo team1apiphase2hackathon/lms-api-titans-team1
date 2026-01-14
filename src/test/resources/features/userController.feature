@@ -6,11 +6,15 @@ Feature: User Controller
 Background:
 Given Admin has a valid authorization token in user controller
 
-  @post
+  @post 
    Scenario: Check if admin able to create a admin with valid endpoint and request body with only mandatory fields
     When Admin sends HTTPS POST Request and request Body with mandatory fields and admin role                          
     Then Admin receives 201 Created Status with response body
     
+   @post 
+   Scenario: Check if admin able to create a admin with valid endpoint and request body with multiple roles
+    When Admin sends HTTPS POST Request and request Body with multiple roles                          
+    Then Admin receives 201 Created Status with response body
     
   @post
   Scenario Outline: Check if admin able to create a new admin with valid endpoint and request body with different roles
@@ -18,103 +22,170 @@ Given Admin has a valid authorization token in user controller
     Then Admin receives 201 Created Status with response body
     Examples:
     |roles	|
-    |AdminRole		|
-    |StaffRole		|
-    |StudentRole		|
+    |CreateUserWithAdminRole		|
+    |CreateUserWithStaffRole		|
+    |CreateUserWithStudentRole		|
    
-    @post @wip
+    @post
     Scenario Outline: Check if admin able to create a new admin with valid endpoint and request body with different visa status
     When Admin sends HTTPS POST Request and request Body with mandatory and additional fields with diff"<visaStatus>"                                                                                                                                            
     Then Admin receives 201 Created Status with response body
     Examples:
     |visaStatus	|
-    |NotSpecifiedVisa	|
-    |NAVisa	|
-    |GCEADVisa		|
-    |H4EADVisa		|
-    | H4Visa		|
-    |H1BVisa		|
-    | CanadaEADVisa|
-    |IndianCitizenVisa	|
-    | USCitizenVisa		|
-    | CanadaCitizen	|
+    |CreateUserWithNotSpecifiedVisa	|
+    |CreateUserWithNAVisa	|
+    |CreateUserWithGCEADVisa		|
+    |CreateUserWithH4EADVisa		|
+    | CreateUserWithH4Visa		|
+    |CreateUserWithH1BVisa		|
+    | CreateUserWithCanadaEADVisa|
+    |CreateUserWithIndianCitizenVisa	|
+    | CreateUserWithUSCitizenVisa		|
+    | CreateUserWithCanadaCitizen	|
    
-    #Scenario Outline: Check if admin able to create a new admin with valid endpoint and request body with different time zones
-    #When Admin sends HTTPS POST Request and request Body with mandatory and additional fields with <timeZone>                                                                                                                                             
-    #Then Admin receives 201 Created Status with response body
+   @post
+    Scenario Outline: Check if admin able to create a new admin with valid endpoint and request body with different time zones
+    When Admin sends HTTPS POST Request and request Body with mandatory and additional fields with different "<timeZone>"                                                                                                                                      
+    Then Admin receives 201 Created Status with response body
+    Examples:
+    |timeZone	|
+    |CreateUserWithPST		|
+    |CreateUserWithMST		|
+    |CreateUserWithCST		|
+    |CreateUserWithEST		|
+    | CreateUserWithIST		|
+
+    
+    @post  
+   Scenario: Check if admin able to create a admin with valid endpoint and request body and existing values in phone no
+    When Admin sends HTTPS POST Request and request Body with mandatory and additional fields with existing phone number                               
+    Then Admin receives 400 Bad Request Status with phone number existing message
+
+   @post 
+   Scenario: Check if admin able to create a admin with valid endpoint and request body and with existing values in userLoginEmail
+    When Admin sends HTTPS POST Request and request Body with mandatory and additional fields with existing userLoginEmail                               
+    Then Admin receives 201 Created Status with response body
+
+   @post
+   Scenario Outline: Check if admin able to create a admin missing mandatory fields in request body
+    When Admin sends HTTPS POST Request and request Body with missing mandatory "<mandatoryField>"
+    Then Admin receives 400 Bad Request Status with message
+    Examples:
+  | mandatoryField                       |
+  | CreateAdmin_valid_missingFirstName |
+  | CreateAdmin_valid_missingLastName  |
+  | CreateAdmin_valid_missingLocation		|
+	| CreateAdmin_valid_missingTimezone		|
+  | CreateAdmin_valid_missingVisaStatus	|
+	| CreateAdmin_valid_missingRoleId			|
+  | CreateAdmin_valid_missingRoleStatus  |
+	| CreateAdmin_valid_missinguserLogin	|
+    
+    @post
+   Scenario Outline: Check if admin able to create a admin missing additional fields in request body
+    When Admin sends HTTPS POST Request and request Body with missing additional "<additionalField>"
+    Then Admin receives 201 Created Status with response body
+    Examples:
+  | additionalField                       |
+  | CreateAdmin_valid_missinguserComments |
+  | CreateAdmin_valid_missinguserEduPg  |
+   | CreateAdmin_valid_missinguserEduUg  |
+  | CreateAdmin_valid_missinguserLinkedinUrl		|
+	| CreateAdmin_valid_missinguserMiddleName		|
+  | CreateAdmin_valid_missinguserPhoneNumber	|
+
+	
+    @get
+  Scenario: Check if admin able to retrieve all users with valid LMS API
+    When Admin sends GET Request for the LMS API All users endpoint
+    Then Admin receives 200 OK Status with response body
+
+  @get 
+  Scenario: Check if admin able to retrieve all active users with valid LMS API
+    When Admin sends GET Request for the LMS API All active users endpoint
+    Then Admin receives 200 OK Status with response body
+
+  @get 
+  Scenario: Check if admin able to retrieve emails of all users with active status
+    When Admin sends GET Request for the LMS API 
+    Then Admin receives 200 OK Status with response body
+    
+    
+     @get 
+   Scenario: Check if admin able to retrieve a admin with valid LMS API
+    When Admin sends GET Request for the LMS API admin Roles endpoint
+    Then Admin receives 200 OK Status with response body
+    
+   @get 
+	 Scenario Outline: Check if admin able to retrieve a admin with valid userID
+    When Admin sends GET Request for the LMS API endpoint with valid "<userID>"
+    Then Admin receives 200 OK Status with response body
+    Examples:
+    |userID|
+    |GetAdminId|
+    |GetStaffId|
+    |GetStudentId|
+    
+     @get
+   Scenario: Check if admin able to retrieve a admin with invalid user ID
+    When Admin sends GET Request for the LMS API endpoint with invalid user ID
+    Then Admin receives 404 Not Found Status with message
+    
+     @get
+  Scenario: Check if admin able to retrieve all users with roles
+    When Admin sends GET Request for the LMS API all users with roles
+    Then Admin receives 200 OK Status with response body
+    
+     @get
+  Scenario Outline: Check if admin able to retrieve all active and inactive users count
+    When Admin sends GET Request for the LMS API all users count for "<User>"
+    Then Admin receives 200 OK Status with response body
+   Examples:
+    |User|
+    |Get_ActiveInactiveUsers_Count|
+		|Get_All_ActiveInactiveUsers_Count|
+		|Get_All_ActiveInactive_AdminUsers_Count|
+		|Get_All_ActiveInactive_StaffUsers_Count|
+		|Get_All_ActiveInactive_StudentUsers_Count|
+
+     @get 
+  Scenario: Check if admin able to retrieve user by program batchId
+    When Admin sends GET Request for the LMS API user by program batchId
+    Then Admin receives 200 OK Status with response body
+    
+       @get
+  Scenario: Check if admin able to retrieve user by program
+    When Admin sends GET Request for the LMS API user by program
+    Then Admin receives 200 OK Status with response body
+    
+     #@get @wip
+   #Scenario Outline: Check if admin able to retrieve user by roleId
+    #When Admin sends GET Request for the LMS API "<roleId>"
+    #Then Admin receives 200 OK Status with response body
     #Examples:
-    #|timeZone	|
-    #|PST		|
-    #|MST		|
-    #|CST		|
-    #|EST		|
-    #| IST		|
-#
+    #|roleId|
+    #|R01|
+    #|R02|
+    #|R03|
     #
-    #@post
-   #Scenario: Check if admin able to create a admin with valid endpoint and request body and existing values in phone no
-    #When Admin sends HTTPS POST Request and request Body with mandatory and additional fields with existing phone number                               
-    #Then Admin receives 400 Bad Request Status with message and boolean success details
-#
-   #@post
-   #Scenario: Check if admin able to create a admin with valid endpoint and request body and with existing values in userLoginEmail
-    #When Admin sends HTTPS POST Request and request Body with mandatory and additional fields with existing userLoginEmail                               
-    #Then Admin receives 201 Created Status with response body
-#
-   #@post
-   #Scenario Outline: Check if admin able to create a admin missing mandatory fields in request body
-    #When Admin sends HTTPS POST Request and request Body with missing <mandatoryField>
-    #Then Admin receives 400 Bad Request Status with message and boolean success details
-    #Examples:
-  #| mandatoryField                       |
-  #| CreateAdmin_valid_missingFirstName |
-  #| CreateAdmin_valid_missingLastName  |
-  #| CreateAdmin_valid_missingLocation		|
-#	| CreateAdmin_valid_missingTimezone		|
-  #| CreateAdmin_valid_missingVisaStatus	|
-#	| CreateAdmin_valid_missingRoleId			|
-  #| CreateAdmin_valid_missingRoleStatus  |
-#	| CreateAdmin_valid_missinguserLogin	|
-    #
-    #@post
-   #Scenario Outline: Check if admin able to create a admin missing additional fields in request body
-    #When Admin sends HTTPS POST Request and request Body with missing <additionalField>
-    #Then Admin receives 201 Created Status with response body
-    #Examples:
-  #| additionalField                       |
-  #| CreateAdmin_valid_missinguserComments |
-  #| CreateAdmin_valid_missinguserEduPg  |
-   #| CreateAdmin_valid_missinguserEduUg  |
-  #| CreateAdmin_valid_missinguserLinkedinUrl		|
-#	| CreateAdmin_valid_missinguserMiddleName		|
-  #| CreateAdmin_valid_missinguserPhoneNumber	|
-#
-#	
-    #@get
-  #Scenario: Check if admin able to retrieve all admin with valid LMS API
-    #When Admin sends GET Request for the LMS API All admin endpoint
-    #Then Admin receives 200 OK Status with response body
-#
- #@get
-#	 Scenario: Check if admin able to retrieve a admin with valid admin ID
-    #When Admin sends GET Request for the LMS API endpoint with valid admin ID
+      #@get
+  #Scenario: Check if admin able to retrieve user by roleId V2
+    #When Admin sends GET Request for the LMS API user by roleId v2
     #Then Admin receives 200 OK Status with response body
     #
-     #@get
-   #Scenario: Check if admin able to retrieve a admin with invalid admin ID
-    #When Admin sends GET Request for the LMS API endpoint with invalid admin ID
-    #Then Admin receives 404 Not Found Status with message and boolean success details
-    #
-     #@get
-   #Scenario: Check if admin able to retrieve a admin with valid LMS API
-    #When Admin sends GET Request for the LMS API All Staff endpoint
+       #@get
+  #Scenario: Check if admin able to retrieve batchId by userId
+    #When Admin sends GET Request for the LMS API batchId by userId
     #Then Admin receives 200 OK Status with response body
     #
-     #@get
-   #Scenario: Check if admin able to retrieve a admin with valid LMS API
-    #When Admin sends GET Request for the LMS API admin Roles endpoint
+       #@get
+  #Scenario: Check if admin able to retrieve user details by Id
+    #When Admin sends GET Request for the LMS API user details by Id
     #Then Admin receives 200 OK Status with response body
-    #
+    
+    
+    
+    
     #@put
    #Scenario: Check if admin able to update a admin with valid admin ID and request body
     #When Admin sends HTTPS PUT Request and  request Body with mandatory and additional fields and valid adminID                                 
@@ -160,12 +231,27 @@ Given Admin has a valid authorization token in user controller
     #When Admin sends HTTPS PUT Request and request Body with missing mandatory fields and valid adminID                                              
     #Then Admin receives 400 Bad Request Status with message and boolean success details
     #
-    @delete
-   Scenario: Check if admin able to delete a admin with valid admin Id
-    When Admin sends DELETE Request for the LMS API endpoint  and  valid admin ID
+    @delete 
+   Scenario: Check if admin able to delete a admin with valid user
+    When Admin sends DELETE Request for the LMS API endpoint  and  valid user
     Then Admin receives 200 OK Status with response body
-    #
-    #@delete
-   #Scenario: Check if admin able to delete a admin with valid LMS API,invalid admin Id
-    #When Admin sends DELETE Request for the LMS API endpoint  and  invalid admin ID
-    #Then Admin receives 404 Not Found Status with message and boolean success details
+    
+       @delete 
+   Scenario: Check if admin able to delete a admin with valid admin user
+    When Admin sends DELETE Request for the LMS API endpoint  and  valid admin user
+    Then Admin receives 200 OK Status with response body
+    
+       @delete 
+   Scenario: Check if admin able to delete a admin with valid staff user
+    When Admin sends DELETE Request for the LMS API endpoint  and  valid staff user
+    Then Admin receives 200 OK Status with response body
+    
+       @delete 
+   Scenario: Check if admin able to delete a admin with valid student user
+    When Admin sends DELETE Request for the LMS API endpoint  and  valid student user
+    Then Admin receives 200 OK Status with response body
+    
+    @delete
+   Scenario: Check if admin able to delete a admin with valid LMS API,invalid admin Id
+    When Admin sends DELETE Request for the LMS API endpoint  and  invalid admin ID
+    Then Admin receives 404 Not Found Status with not found message
