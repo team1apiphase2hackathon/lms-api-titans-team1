@@ -1,14 +1,14 @@
 Feature: Program
 
 
-    @programs1
+
   Scenario Outline: Verify if admin is able to create a Program
     Given Admin has a valid authorization token set
     When Admin sends POST request to create program with different payload for "<ScenarioName>" from dataSheet
     Then Admin verifies the response payload with expected output from the data sheet
 
     Examples:
-      |			ScenarioName			|
+      |			ScenarioName		|
      |CreateProgram_with_Invalid_Endpoint	|
      |CreateProgram_with_InvalidMethod	|
      |CreateProgram_with_ProgramName_LessThan_3_Characters		|
@@ -23,36 +23,35 @@ Feature: Program
       |CreateProgram_with_Valid_ProgramDesc_ProgramName_Active_Status		|
       |CreateProgram_with_Valid_ProgramDesc_ProgramName_Active_Status		|
 
-
+  @programs1
   Scenario Outline: Verify if admin is able to GET Program by ProgramId
 
-    #When Admin sends GET request to get program with different payload for "<ScenarioName>" from dataSheet
+    Given Admin has a valid authorization token set
+    When Admin sends GET request to get program with different payload for "<ScenarioName>" from dataSheet
     Then Admin verifies the response payload with expected output from the data sheet for Get Program
 
-    Examples:
-      |			ScenarioName				|
-      |	GetProgramById_with_Invalid_BaseURI		|
-      |	GetProgramById_with_Invalid_BasePath	|
-      |	GetProgramById_with_Invalid_Method		|
-      |	GetProgramById_with_Invalid_ProgramId	|
-      |	GetProgramById_with_Valid_ProgramId		|
-
+    Scenarios:
+      |ScenarioName|
+      |GetProgramById_with_Invalid_Endpoint	|
+      |GetProgramById_with_Invalid_Method		|
+      |GetProgramById_with_Invalid_ProgramId	|
+      |GetProgramById_with_Valid_ProgramId		|
+  @programs1
   Scenario Outline: Verify if admin is able to GET All Programs
 
-    When Admin sends GET request to get all programs with different payload for <"ScenarioName"> from dataSheet
+    When Admin sends GET request to get all programs with different payload for "<ScenarioName>" from dataSheet
     Then Admin verifies the response payload with expected output from the data sheet for Get All Programs
 
     Examples:
-      |			ScenarioName				|
-      |	GetPrograms_with_Invalid_BaseURI	|
-      |	GetPrograms_with_Invalid_BasePath	|
-      |	GetPrograms_with_Invalid_Method		|
+      |     ScenarioName      |
+      |	GetPrograms_with_Invalid_Endpoint	|
+      |	GetPrograms_with_Invalid_Method 	|
       |	Get_All_Programs					|
 
 
-  Scenario Outline: Verify if admin is able to UPDATE a ProgramByProgramid using PUT method
+  Scenario Outline: Verify if admin is able to UPDATE a ProgramByProgramId using PUT method
 
-    When Admin sends PUT request to update programById with payload for <"ScenarioName"> using dataSheet
+    When Admin sends PUT request to update programById with payload for "<ScenarioName>" using dataSheet
     Then Admin verifies the response payload with expected output from the data sheet for Update Program ByProgramId
 
     Examples:
@@ -68,13 +67,12 @@ Feature: Program
       |	UpdateProgramById_ProgramID_InActive_Status				|
       |	UpdateProgramById_ProgramID_Active_Status				|
       |UpdateProgramById_with_Valid_ProgramDesc_ProgramName_Active_Status		|
-      |UpdateProgramById_ProgramID_InActive_Status				|
       |UpdateProgramById_with_SpecialCharacters				|
       |UpdateProgramById_with_Valid_Inputs				|
 
   Scenario Outline: Verify if admin is able to UPDATE a ProgramByProgramName using PUT method
 
-    When Admin sends PUT request to update programByName with payload for <"ScenarioName"> using dataSheet
+    When Admin sends PUT request to update programByName with payload for "<ScenarioName>" using dataSheet
     Then Admin verifies the response payload with expected output from the data sheet for Update Program ByProgramName
 
     Examples:
