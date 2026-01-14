@@ -29,6 +29,7 @@ public class UserControllerStepDef extends GlobalTestData{
 	 @Given("Admin has a valid authorization token in user controller")
 	 public void admin_has_a_valid_authoization_token_in_user_controller() {
 		 requestSpec = RequestSpecUtil.getRequestSpec();
+		 RequestSpecUtil.logScenarioName("USER CONTROLLER MODULE LOGS");
 	 }
 
 

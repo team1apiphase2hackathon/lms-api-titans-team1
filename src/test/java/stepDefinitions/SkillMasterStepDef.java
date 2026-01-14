@@ -29,6 +29,7 @@ public class SkillMasterStepDef extends GlobalTestData{
 	 @Given("Admin has a valid authorization token")
 	 public void admin_has_a_valid_authoization_token() {
 		 requestSpec = RequestSpecUtil.getRequestSpec();
+			RequestSpecUtil.logScenarioName("SKILL MASTER MODULE LOGS");
 	 }
 	
 	 
@@ -37,6 +38,7 @@ public class SkillMasterStepDef extends GlobalTestData{
 	@When("Admin sends HTTPS POST Request and  request Body with mandatory")
 	public void admin_sends_https_post_request_and_request_body_with_mandatory() throws Exception {
       data = ExcelReader.readExcelData("Skill", "CreateSkill_Valid_NonExistingValues");
+  
       requestSpec = requestSpec.body(data.get("Body"));
       response = ApiRequest.sendRequest(requestSpec,"POST", data.get("Endpoint"));
       String createdSkillName =response.jsonPath().getString("skillName");
