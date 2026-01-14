@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "roleId": { "type": "string" },
+    "users": {
+      "type": "array",
+      "items": {
+        "$ref": "user-basic.schema.json"
+      }
+    }
+  },
+  "required": ["roleId", "users"]
+}

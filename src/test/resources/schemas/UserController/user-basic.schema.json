@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "userId": { "type": "string" },
+    "userFirstName": { "type": "string" },
+    "userLastName": { "type": "string" },
+    "userLoginEmail": { "type": "string" },
+    "userPhoneNumber": { "type": "integer" },
+    "userLocation": { "type": "string" },
+    "userTimeZone": { "type": "string" },
+    "userVisaStatus": { "type": "string" },
+    "userEduUg": { "type": "string" },
+    "userEduPg": { "type": "string" },
+    "userLinkedinUrl": { "type": "string" },
+    "userComments": { "type": "string" },
+    "userMiddleName": { "type": "string" }
+  },
+  "required": [
+    "userId",
+    "userFirstName",
+    "userLastName",
+    "userLoginEmail"
+  ]
+}

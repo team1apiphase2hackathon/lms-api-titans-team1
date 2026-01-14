@@ -29,7 +29,7 @@ Given Admin has a valid authorization token
    @get
    Scenario: Check if admin able to get Skill Master Name with valid endpoint 
    When Admin sends HTTPS GET Request with SkillMasterName
-   Then Admin receives 200 Status with response body 
+   Then Admin receives 200 Status with response body for that skill
    
    @get
    Scenario: Check if admin able to get Skill Master Name with invalid endpoint 

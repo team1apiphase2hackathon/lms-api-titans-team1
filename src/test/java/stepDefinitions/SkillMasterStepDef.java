@@ -1,5 +1,6 @@
 package stepDefinitions;
 
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.Matchers.equalTo;
 
 import java.util.Map;
@@ -14,38 +15,40 @@ import specs.RequestSpecUtil;
 import specs.ResponseSpecUtil;
 import utils.ExcelReader;
 import utils.ExternalTestDataStore;
+import utils.GlobalTestData;
 
-public class SkillMasterStepDef {
+public class SkillMasterStepDef extends GlobalTestData{
 
 	
 	 private Response response;	 
 	 private Map<String,String> data;
 	 private RequestSpecification requestSpec;
-
+	 private String updatedskillName;
 	
 	 
 	 @Given("Admin has a valid authorization token")
 	 public void admin_has_a_valid_authoization_token() {
 		 requestSpec = RequestSpecUtil.getRequestSpec();
+			RequestSpecUtil.logScenarioName("SKILL MASTER MODULE LOGS");
 	 }
-
+	
 	 
 	//POST REQUEST
 
 	@When("Admin sends HTTPS POST Request and  request Body with mandatory")
 	public void admin_sends_https_post_request_and_request_body_with_mandatory() throws Exception {
       data = ExcelReader.readExcelData("Skill", "CreateSkill_Valid_NonExistingValues");
+  
       requestSpec = requestSpec.body(data.get("Body"));
       response = ApiRequest.sendRequest(requestSpec,"POST", data.get("Endpoint"));
-      String skillName =response.jsonPath().getString("skillName");
-      ExternalTestDataStore.put("skillName", skillName);
-      String skillID =response.jsonPath().getString("skillId");
-      ExternalTestDataStore.put("skillId", skillID);
+      String createdSkillName =response.jsonPath().getString("skillName");
+      skillName = createdSkillName;
+      String createdSkillId =response.jsonPath().getString("skillId");
+      skillId = createdSkillId;
    }
 	@Then("Admin receives {int} Created Status with response body.")
 	public void admin_receives_created_status_with_response_body(Integer num) {
-		String expectedskillName = ExternalTestDataStore.get("skillName");
-		 response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num)).body("skillName", equalTo(expectedskillName));
+		 response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num)).body("skillName", equalTo(skillName)).body(matchesJsonSchemaInClasspath("schemas/SkillMaster/CreateSkillResponseSchema.json"));
 	}
 	
 	@When("Admin sends HTTPS POST Request and  request Body with mandatory and existing values")
@@ -79,19 +82,21 @@ public class SkillMasterStepDef {
 	}
 	@Then("Admin receives {int} Status with response body")
 	public void admin_receives_status_with_response_body(Integer num) {
-		response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num));
+		response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num)).body(matchesJsonSchemaInClasspath("schemas/SkillMaster/GetAllSkillResponseSchema.json"));
 	}
 	
 	@When("Admin sends HTTPS GET Request with SkillMasterName")
 	public void admin_sends_https_get_request_with_skill_master_name() throws Exception {
 		 data = ExcelReader.readExcelData("Skill", "GetSkill_Valid");  
-		 String skillName = ExternalTestDataStore.get("skillName");
-		if (skillName == null) {
-			        throw new IllegalStateException("Skill name not found in external store");
-			    }
 		 String endpoint = data.get("Endpoint").replace("{skillMasterName}", skillName);
 		 response = ApiRequest.sendRequest(requestSpec,"GET",endpoint);
 	}
+	
+	@Then("Admin receives {int} Status with response body for that skill")
+	public void admin_receives_status_with_response_body_for_that_skill(Integer num) {
+		response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num)).body(matchesJsonSchemaInClasspath("schemas/SkillMaster/GetSkillBySkillNameResponseSchema.json"));
+	}
+	
 	
 	@When("Admin sends HTTPS GET Request with invalid SkillMasterName")
 	public void admin_sends_https_get_request_with_invalid_skill_master_name() throws Exception {
@@ -116,17 +121,14 @@ public class SkillMasterStepDef {
 	public void admin_sends_https_put_request_and_request_body_with_mandatory() throws Exception {
 		 data = ExcelReader.readExcelData("Skill", "UpdateSkill_Valid");   
 		 requestSpec = requestSpec.body(data.get("Body"));
-		 String skillId = ExternalTestDataStore.get("skillId");
 		 String endpoint = data.get("Endpoint").replace("{skillId}", skillId);
 	     response = ApiRequest.sendRequest(requestSpec,"PUT",endpoint);
-	     String updatedskillName =response.jsonPath().getString("skillName");
-	      ExternalTestDataStore.put("updatedskillName", updatedskillName);
+	     updatedskillName =response.jsonPath().getString("skillName");
 	}
 	
 	@Then("Admin receives {int} Status with updated response body.")
 	public void admin_receives_status_with_updated_response_body(Integer num) {
-		String expectedSkillName = ExternalTestDataStore.get("updatedskillName");
-		response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num)).body("skillName", equalTo(expectedSkillName));
+		response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num)).body("skillName", equalTo(updatedskillName));
 	}
 
 	@When("Admin sends HTTPS PUT Request and  request Body with mandatory with wrong skillID")
@@ -147,11 +149,7 @@ public class SkillMasterStepDef {
 	@When("Admin sends HTTPS DELETE Request")
 	public void admin_sends_https_delete_request() throws Exception {
 		 data = ExcelReader.readExcelData("Skill", "DeleteSkill_Valid");   
-		 String skillID = ExternalTestDataStore.get("skillId");
-		 if (skillID == null) {
-			        throw new IllegalStateException("Skill name not found in external store");
-			    }
-		 String endpoint = data.get("Endpoint").replace("{skillId}", skillID);
+		 String endpoint = data.get("Endpoint").replace("{skillId}", skillId);
 		 response = ApiRequest.sendRequest(requestSpec,"DELETE",endpoint);
 	}
 	
