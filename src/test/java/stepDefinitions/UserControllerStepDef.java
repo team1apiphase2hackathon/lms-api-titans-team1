@@ -1,5 +1,6 @@
 package stepDefinitions;
 
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.Matchers.equalTo;
 
 import java.io.IOException;
@@ -16,9 +17,10 @@ import specs.RequestSpecUtil;
 import specs.ResponseSpecUtil;
 import utils.ExcelReader;
 import utils.ExternalTestDataStore;
+import utils.GlobalTestData;
 import utils.HelperClass;
 
-public class UserControllerStepDef {
+public class UserControllerStepDef extends GlobalTestData{
 	
 	 private Response response;	 
 	 private Map<String,String> data;
@@ -29,7 +31,6 @@ public class UserControllerStepDef {
 		 requestSpec = RequestSpecUtil.getRequestSpec();
 	 }
 
-	 //userId
 
 	 
 //POST REQUEST 
@@ -46,8 +47,8 @@ public class UserControllerStepDef {
 		data = ExcelReader.readExcelData("User", "CreateAdmin_valid_mulitpleRoles");
 	      requestSpec = requestSpec.body(data.get("Body"));
 	      response = ApiRequest.sendRequest(requestSpec,"POST", data.get("Endpoint"));
-	      String userId =response.jsonPath().getString("user.userId");
-	      ExternalTestDataStore.put("userId", userId);
+	      String TuserId =response.jsonPath().getString("user.userId");;
+	      userId = TuserId;
 	}
 	
 	@Then("Admin receives {int} Created Status with response body")
@@ -55,7 +56,11 @@ public class UserControllerStepDef {
 		response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num));
 	}
 
-	
+	@Then("Admin receives {int} Created Status with response body and schema validation")
+	public void admin_receives_created_status_with_response_body_and_schema_validation(Integer num) {
+		response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num)).body(matchesJsonSchemaInClasspath("schemas/UserController/CreateUserResponseSchema.json"));
+	}
+
 	@When("Admin sends HTTPS POST Request and request Body with mandatory and additional fields with {string}")
     public void admin_sends_https_post_request_and_request_body_with_mandatory_and_additional_fields_with(String roles) throws Exception {
 		data = ExcelReader.readExcelData("User", roles);
@@ -63,15 +68,15 @@ public class UserControllerStepDef {
 	      response = ApiRequest.sendRequest(requestSpec,"POST", data.get("Endpoint"));
 	      if(roles.contentEquals("CreateUserWithAdminRole")) {
 	      String AdminUser =response.jsonPath().getString("user.userId");
-	      ExternalTestDataStore.put("AdminUserId", AdminUser);
+	      AdminUserId = AdminUser;
 	      }
 	      else if(roles.contentEquals("CreateUserWithStaffRole")){
 	    	  String StaffUser =response.jsonPath().getString("user.userId");
-		      ExternalTestDataStore.put("StaffUserId", StaffUser);
+	    	  StaffUserId = StaffUser;
 	      }
 	      else {
 	    	  String StudentUser =response.jsonPath().getString("user.userId");
-		      ExternalTestDataStore.put("StudentUserId", StudentUser);
+	    	  StudentUserId = StudentUser;
 	      }
 	     
     }
@@ -185,22 +190,18 @@ public class UserControllerStepDef {
 	public void admin_sends_get_request_for_the_lms_api_endpoint_with_valid(String user) throws Exception {
 		data = ExcelReader.readExcelData("User", user);
 		if(user.contentEquals("GetAdminId")) {
-			 String tempUserId = ExternalTestDataStore.get("AdminUserId");
-			 String endpoint = data.get("Endpoint").replace("{userId}", tempUserId);
+			 String endpoint = data.get("Endpoint").replace("{userId}", AdminUserId);
 			    response = ApiRequest.sendRequest(requestSpec,"GET", endpoint);
 		}
 		else if(user.contentEquals("GetStaffId")) {
-			 String tempUserId = ExternalTestDataStore.get("StaffUserId");
-			 String endpoint = data.get("Endpoint").replace("{userId}", tempUserId);
+			 String endpoint = data.get("Endpoint").replace("{userId}", StaffUserId);
 			    response = ApiRequest.sendRequest(requestSpec,"GET", endpoint);
 		}
 		else {
-			 String tempUserId = ExternalTestDataStore.get("StudentUserId");
-			 String endpoint = data.get("Endpoint").replace("{userId}", tempUserId);
+			 String endpoint = data.get("Endpoint").replace("{userId}", StudentUserId);
 			    response = ApiRequest.sendRequest(requestSpec,"GET", endpoint);
 		}
-	  
-	      //AdminUserId,StaffUserId,StudentUserId
+
 	}
 
 	
@@ -229,16 +230,14 @@ public class UserControllerStepDef {
 	@When("Admin sends GET Request for the LMS API user by program batchId")
 	public void admin_sends_get_request_for_the_lms_api_user_by_program_batchid() throws Exception {
 		data = ExcelReader.readExcelData("User", "Get_User_by_Program_Batches");
-			 String tempBatchId = "1"; //ExternalTestDataStore.get("AdminUserId"); ////////////Change it to batch ID 
-			 String endpoint = data.get("Endpoint").replace("{batchId}", tempBatchId);
+			 String endpoint = data.get("Endpoint").replace("{batchId}", "1");  ///////Change it to batchId API Chaining
 			    response = ApiRequest.sendRequest(requestSpec,"GET", endpoint);
 	}
 	
 	@When("Admin sends GET Request for the LMS API user by program")
 	public void admin_sends_get_request_for_the_lms_api_user_by_program() throws Exception {
 		data = ExcelReader.readExcelData("User", "Get_User_by_Program");
-			 String tempProgramId = "1"; //ExternalTestDataStore.get("AdminUserId"); ////////////Change it to program ID 
-			 String endpoint = data.get("Endpoint").replace("{programId}", tempProgramId);
+			 String endpoint = data.get("Endpoint").replace("{programId}", "1");////////////Change it to programId  API Chaining
 			    response = ApiRequest.sendRequest(requestSpec,"GET", endpoint);
 	}
 	
@@ -258,21 +257,18 @@ public class UserControllerStepDef {
 		response = ApiRequest.sendRequest(requestSpec,"GET", data.get("Endpoint"));
 	}
 	
-	//Admin sends GET Request for the LMS API batchId by userId
+
 	@When("Admin sends GET Request for the LMS API batchId by userId")
 	public void admin_sends_get_request_for_the_lms_api_batchid_by_userid() throws Exception {
-		String tempUserId = ExternalTestDataStore.get("AdminUserId");
-		 String endpoint = data.get("Endpoint").replace("{userId}", tempUserId);
-		
-		data = ExcelReader.readExcelData("User", "Get_Batch_by_UserId");
+		 String endpoint = data.get("Endpoint").replace("{userId}", AdminUserId);
+		 data = ExcelReader.readExcelData("User", "Get_Batch_by_UserId");
 		response = ApiRequest.sendRequest(requestSpec,"GET", endpoint);
 	}
 	
-	//Admin sends GET Request for the LMS API user details by Id
+
 	@When("Admin sends GET Request for the LMS API user details by Id")
 	public void admin_sends_get_request_for_the_lms_api_user_details_by_id() throws Exception {
-		String tempUserId = ExternalTestDataStore.get("AdminUserId");
-		 String endpoint = data.get("Endpoint").replace("{userId}", tempUserId);
+		 String endpoint = data.get("Endpoint").replace("{userId}", AdminUserId);
 		data = ExcelReader.readExcelData("User", "Get_User_Details_by_Id");
 		response = ApiRequest.sendRequest(requestSpec,"GET", endpoint);
 	}
@@ -342,7 +338,6 @@ public class UserControllerStepDef {
 	@When("Admin sends DELETE Request for the LMS API endpoint  and  valid user")
 	public void admin_sends_delete_request_for_the_lms_api_endpoint_and_valid_user() throws IOException {
 		 data = ExcelReader.readExcelData("User", "DeleteAdmin_validUser");  
-		 String userId = ExternalTestDataStore.get("userId");
 		 String endpoint = data.get("Endpoint").replace("{userID}", userId);
 		 response = ApiRequest.sendRequest(requestSpec,"DELETE",endpoint);
 	}
@@ -350,23 +345,20 @@ public class UserControllerStepDef {
 	@When("Admin sends DELETE Request for the LMS API endpoint  and  valid admin user")
 	public void admin_sends_delete_request_for_the_lms_api_endpoint_and_valid_admin_user() throws IOException {
 		 data = ExcelReader.readExcelData("User", "DeleteAdmin_validAdminID");  
-		 String adminuserId = ExternalTestDataStore.get("AdminUserId");
-		 String endpoint = data.get("Endpoint").replace("{userID}", adminuserId);
+		 String endpoint = data.get("Endpoint").replace("{userID}", AdminUserId);
 		 response = ApiRequest.sendRequest(requestSpec,"DELETE",endpoint);
 	}
 	
 	@When("Admin sends DELETE Request for the LMS API endpoint  and  valid staff user")
 	public void admin_sends_delete_request_for_the_lms_api_endpoint_and_valid_staff_user() throws IOException {
 		 data = ExcelReader.readExcelData("User", "DeleteAdmin_validStaffUserID");  
-		 String staffuserId = ExternalTestDataStore.get("StaffUserId");
-		 String endpoint = data.get("Endpoint").replace("{userID}", staffuserId);
+		 String endpoint = data.get("Endpoint").replace("{userID}", StaffUserId);
 		 response = ApiRequest.sendRequest(requestSpec,"DELETE",endpoint);
 	}
 	@When("Admin sends DELETE Request for the LMS API endpoint  and  valid student user")
 	public void admin_sends_delete_request_for_the_lms_api_endpoint_and_valid_student_user() throws IOException {
 		 data = ExcelReader.readExcelData("User", "DeleteAdmin_validStudentUserID");  
-		 String studentuserId = ExternalTestDataStore.get("StudentUserId");
-		 String endpoint = data.get("Endpoint").replace("{userID}", studentuserId);
+		 String endpoint = data.get("Endpoint").replace("{userID}", StudentUserId);
 		 response = ApiRequest.sendRequest(requestSpec,"DELETE",endpoint);
 	} 
     
@@ -386,9 +378,8 @@ public class UserControllerStepDef {
 			String invalidUserID = endpoint.substring(endpoint.lastIndexOf("/") + 1);
 			  System.out.println(invalidUserID);
 		    String expectedMessage = "UserID: " + invalidUserID + " does not exist ";
-		  
 	response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num)).body("message", equalTo(expectedMessage));
-	//UserID: U10001 does not exist 
+
 	}
 	
 	

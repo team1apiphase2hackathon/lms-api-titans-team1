@@ -14,7 +14,7 @@ Given Admin has a valid authorization token in user controller
    @post 
    Scenario: Check if admin able to create a admin with valid endpoint and request body with multiple roles
     When Admin sends HTTPS POST Request and request Body with multiple roles                          
-    Then Admin receives 201 Created Status with response body
+    Then Admin receives 201 Created Status with response body and schema validation
     
   @post
   Scenario Outline: Check if admin able to create a new admin with valid endpoint and request body with different roles

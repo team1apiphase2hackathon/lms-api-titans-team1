@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "userId": { "type": "string" },
+      "userFirstName": { "type": "string" },
+      "userLastName": { "type": "string" },
+      "roles": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "roleId": { "type": "string" },
+            "roleName": { "type": "string" }
+          },
+          "required": ["roleId", "roleName"]
+        }
+      }
+    },
+    "required": ["userId", "roles"]
+  }
+}
