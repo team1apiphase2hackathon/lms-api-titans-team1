@@ -64,6 +64,18 @@ public class RequestSpecUtil {
                 .addFilter(ResponseLoggingFilter.logResponseTo(logStream))
                 .build();
     }
+
+
+    public static RequestSpecification getRequestSpecInvalidAuth() {
+        initializeLogStream();
+        return new RequestSpecBuilder()
+                .setBaseUri(ConfigReader.get("base.url"))
+                .addHeader("Authorization", "Bearer InvalidToken")
+                .addHeader("Content-Type", "application/json")
+                .addFilter(RequestLoggingFilter.logRequestTo(logStream))
+                .addFilter(ResponseLoggingFilter.logResponseTo(logStream))
+                .build();
+    }
     
 }
 
