@@ -1,9 +1,12 @@
 Feature: Data Clean up
 
-  @delete
+  @userController
   Scenario: Check if admin able to delete a admin with valid user
+    Given Admin has a valid authorization token in user controller
     When Admin sends DELETE Request for the LMS API endpoint  and  valid user
     Then Admin receives 200 OK Status with response body
+
+
 
   @Program
   Scenario Outline: Verify if admin is able to DELETE a ProgramByProgramId using DELETE method
