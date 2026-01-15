@@ -4,7 +4,10 @@ import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInC
 import static org.hamcrest.Matchers.equalTo;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
+
+import org.testng.Assert;
 
 import endpoints.ApiRequest;
 import io.cucumber.java.en.Given;
@@ -16,7 +19,6 @@ import io.restassured.specification.RequestSpecification;
 import specs.RequestSpecUtil;
 import specs.ResponseSpecUtil;
 import utils.ExcelReader;
-import utils.ExternalTestDataStore;
 import utils.GlobalTestData;
 import utils.HelperClass;
 
@@ -58,8 +60,30 @@ public class UserControllerStepDef extends GlobalTestData{
 	}
 
 	@Then("Admin receives {int} Created Status with response body and schema validation")
-	public void admin_receives_created_status_with_response_body_and_schema_validation(Integer num) {
-		response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num)).body(matchesJsonSchemaInClasspath("schemas/UserController/CreateUserResponseSchema.json"));
+	public void admin_receives_created_status_with_response_body_and_schema_validation(Integer num) throws Exception {
+		response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num))
+		.body(matchesJsonSchemaInClasspath("schemas/UserController/CreateUserResponseSchema.json"));
+	
+		 data = ExcelReader.readExcelData("User", "CreateAdmin_valid_mulitpleRoles");   
+		 String requestbody = data.get("Body");
+		 JsonPath requestJson = new JsonPath(requestbody);
+		 JsonPath responseJson = response.jsonPath();
+		// Validate basic user fields
+		 Assert.assertEquals(responseJson.getString("user.userFirstName"), requestJson.getString("userFirstName"), "userFirstName mismatch");
+		 Assert.assertEquals(responseJson.getString("user.userLastName"), requestJson.getString("userLastName"), "userLastName mismatch");
+		 Assert.assertEquals(responseJson.getString("user.userPhoneNumber"), requestJson.getString("userPhoneNumber"), "userPhoneNumber mismatch");
+		 Assert.assertEquals(responseJson.getString("user.userLocation"), requestJson.getString("userLocation"), "userLocation mismatch");
+		 Assert.assertEquals(responseJson.getString("user.userTimeZone"), requestJson.getString("userTimeZone"), "userTimeZone mismatch");
+		 Assert.assertEquals(responseJson.getString("user.userVisaStatus"), requestJson.getString("userVisaStatus"), "userVisaStatus mismatch");
+
+		 // Validate userLoginEmail separately
+		 Assert.assertEquals(responseJson.getString("user.userLoginEmail"), requestJson.getString("userLogin.userLoginEmail"), "userLoginEmail mismatch");
+
+		 // Validate roles array (order-independent)
+		 List<Map<String, String>> expectedRoles = requestJson.getList("userRoleMaps");
+		 List<Map<String, String>> actualRoles = responseJson.getList("roles");
+		 Assert.assertEqualsNoOrder(actualRoles.toArray(), expectedRoles.toArray());
+	
 	}
 
 	@When("Admin sends HTTPS POST Request and request Body with mandatory and additional fields with {string}")
@@ -139,12 +163,14 @@ public class UserControllerStepDef extends GlobalTestData{
 	      HelperClass.deleteIfCreated(response, requestSpec, "/users/{userID}");
 	      
     }
-	
 	@Then("Admin receives {int} Bad Request Status with message")
 	public void admin_receives_bad_request_status_with_message(Integer num) throws Exception {
 		String expectedMessage = data.get("ExpectedStatusMessage");
+		
 	response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num)).body("message", equalTo(expectedMessage));
 			}
+	
+
 	
 	@When("Admin sends HTTPS POST Request and request Body with missing additional {string}")
     public void admin_sends_https_post_request_and_request_body_with_missing_additional(String additionalField) throws Exception {
@@ -261,16 +287,16 @@ public class UserControllerStepDef extends GlobalTestData{
 
 	@When("Admin sends GET Request for the LMS API batchId by userId")
 	public void admin_sends_get_request_for_the_lms_api_batchid_by_userid() throws Exception {
-		 String endpoint = data.get("Endpoint").replace("{userId}", AdminUserId);
 		 data = ExcelReader.readExcelData("User", "Get_Batch_by_UserId");
+		 String endpoint = data.get("Endpoint").replace("{userId}", AdminUserId);		
 		response = ApiRequest.sendRequest(requestSpec,"GET", endpoint);
 	}
 	
 
 	@When("Admin sends GET Request for the LMS API user details by Id")
 	public void admin_sends_get_request_for_the_lms_api_user_details_by_id() throws Exception {
-		 String endpoint = data.get("Endpoint").replace("{userId}", AdminUserId);
 		data = ExcelReader.readExcelData("User", "Get_User_Details_by_Id");
+		 String endpoint = data.get("Endpoint").replace("{id}", AdminUserId);
 		response = ApiRequest.sendRequest(requestSpec,"GET", endpoint);
 	}
 	
@@ -282,55 +308,211 @@ public class UserControllerStepDef extends GlobalTestData{
 
 	//PUT REQUEST
 	
-	@When("Admin sends HTTPS PUT Request  and request Body with missing mandatory fields")
-	public void admin_sends_https_put_request_and_request_body_with_missing_mandatory_fields() {
-	   
-	}
-
-	
-	@When("Admin sends HTTPS PUT Request and request Body with missing mandatory fields and Mandatory Role ID and Role status")
-	public void admin_sends_https_put_request_and_request_body_with_missing_mandatory_fields_and_mandatory_role_id_and_role_status() {
-	   
-	}
-
-	
-	@When("Admin sends HTTPS PUT Request and request Body with missing mandatory fields and valid adminID")
-	public void admin_sends_https_put_request_and_request_body_with_missing_mandatory_fields_and_valid_admin_id() {
-	    
-	}
-
-	
-	@When("Admin sends HTTPS PUT Request and request Body with mandatory fields and invalid adminID and Mandatory program Id, batch Id ,role id, admin id, admin role program batch status")
-	public void admin_sends_https_put_request_and_request_body_with_mandatory_fields_and_invalid_admin_id_and_mandatory_program_id_batch_id_role_id_admin_id_admin_role_program_batch_status() {
-	  
-	}
-
-	
-	@When("Admin sends HTTPS PUT Request and request Body with mandatory fields and valid adminID and Mandatory program Id, batch Id ,role id, admin id, admin role program batch status")
-	public void admin_sends_https_put_request_and_request_body_with_mandatory_fields_and_valid_admin_id_and_mandatory_program_id_batch_id_role_id_admin_id_admin_role_program_batch_status() {
-	    
-	}
 	
 	@When("Admin sends HTTPS PUT Request and  request Body with mandatory and additional fields and valid adminID")
-	public void admin_sends_https_put_request_and_request_body_with_mandatory_and_additional_fields_and_valid_admin_id() {
+	public void admin_sends_https_put_request_and_request_body_with_mandatory_and_additional_fields_and_valid_admin_id() throws Exception {
+		data = ExcelReader.readExcelData("User", "UpdateAdmin_Valid");
+	      requestSpec = requestSpec.body(data.get("Body"));
+	      String endpoint = data.get("Endpoint").replace("{userId}", userId);
+	      response = ApiRequest.sendRequest(requestSpec,"PUT", endpoint);
+	      
+	}
 	
+	@Then("Admin receives {int} OK Status with updated response")
+	public void admin_receives_ok_status_with_updated_response(Integer num) throws Exception {
+		
+		 data = ExcelReader.readExcelData("User", "UpdateAdmin_Valid");   
+		 String requestbody = data.get("Body");
+		 JsonPath requestJson = new JsonPath(requestbody);
+		 JsonPath responseJson = response.jsonPath();
+	response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num));
+	Map<String, Object> requestMap = requestJson.getMap("");
+    for (Map.Entry<String, Object> entry : requestMap.entrySet()) {
+        String key = entry.getKey();
+        if(key.equalsIgnoreCase("userId")) continue;
+        String expectedValue = String.valueOf(entry.getValue()); 
+        String actualValue = String.valueOf(responseJson.getString(key)); 
+        Assert.assertEquals(actualValue, expectedValue, key + " did not update correctly");
+    }
+
 	}
 	
 	@When("Admin sends HTTPS PUT Request and  request Body with mandatory and additional fields and invalid adminID")
-	public void admin_sends_https_put_request_and_request_body_with_mandatory_and_additional_fields_and_invalid_admin_id() {
-	  
+	public void admin_sends_https_put_request_and_request_body_with_mandatory_and_additional_fields_and_invalid_admin_id() throws Exception {
+		data = ExcelReader.readExcelData("User", "UpdateAdmin_InValid");
+	      requestSpec = requestSpec.body(data.get("Body"));
+	      response = ApiRequest.sendRequest(requestSpec,"PUT", data.get("Endpoint"));
+	      
 	}
 	
+
+	@When("Admin sends HTTPS PUT Request and request Body with missing {string} fields")
+	public void admin_sends_https_put_request_and_request_body_with_missing(String mandatoryFields) throws Exception {
+		data = ExcelReader.readExcelData("User", mandatoryFields);
+	      requestSpec = requestSpec.body(data.get("Body"));
+	      String endpoint = data.get("Endpoint").replace("{userId}", userId);
+	      response = ApiRequest.sendRequest(requestSpec,"PUT", endpoint);
+	      
+	     // HelperClass.deleteIfCreated(response, requestSpec, "/users/{userID}");
+		
+		
+	}
+
+	@Then("Admin receives {int} Bad Request Status with missing message")
+	public void admin_receives_bad_request_status_with_missing_message(Integer num) throws Exception {
+		String expectedMessage = data.get("ExpectedStatusMessage").trim();
+		String actualMessage = response.jsonPath().getString("message").trim();
+	response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num));
+	 Assert.assertEquals(actualMessage, expectedMessage, "Error message mismatch");
+			}
+	
+	
+	 
+	@When("Admin sends HTTPS PUT Request and request Body with only mandatory fields and valid adminID")
+	public void admin_sends_https_put_request_and_request_body_with_only_mandatory_fields_and_valid_admin_id() throws Exception {
+		data = ExcelReader.readExcelData("User", "UpdateAdmin_valid_OnlyMandatory");
+	      requestSpec = requestSpec.body(data.get("Body"));
+	      String endpoint = data.get("Endpoint").replace("{userId}", userId);
+	      response = ApiRequest.sendRequest(requestSpec,"PUT", endpoint);
+	      
+	}
+	
+	@Then("Admin receives {int} OK Status")
+	public void admin_receives_ok_status(Integer num) throws Exception {
+	response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num));
+	}
+
 	@When("Admin sends HTTPS PUT Request and request Body with mandatory fields and valid adminID and Mandatory Role ID and Role status")
-	public void admin_sends_https_put_request_and_request_body_with_mandatory_fields_and_valid_admin_id_and_mandatory_role_id_and_role_status() {
-	   
+	public void admin_sends_https_put_request_and_request_body_with_mandatory_fields_and_valid_admin_id_and_mandatory_role_id_and_role_status() throws Exception {
+		data = ExcelReader.readExcelData("User", "UpdateAdminRoleStatus_Valid");
+	      requestSpec = requestSpec.body(data.get("Body"));
+	      String endpoint = data.get("Endpoint").replace("{userId}", userId);
+	      response = ApiRequest.sendRequest(requestSpec,"PUT", endpoint);
 	}
 
 	
 	@When("Admin sends HTTPS PUT Request and request Body with mandatory fields and invalid adminID and Mandatory Role ID and Role status")
-	public void admin_sends_https_put_request_and_request_body_with_mandatory_fields_and_invalid_admin_id_and_mandatory_role_id_and_role_status() {
-	   
+	public void admin_sends_https_put_request_and_request_body_with_mandatory_fields_and_invalid_admin_id_and_mandatory_role_id_and_role_status() throws Exception {
+		data = ExcelReader.readExcelData("User", "UpdateAdminRoleStatus_InValid");
+	      requestSpec = requestSpec.body(data.get("Body"));
+	      response = ApiRequest.sendRequest(requestSpec,"PUT", data.get("Endpoint"));
 	}
+	
+	
+	
+	@When("Admin sends HTTPS PUT Request and request Body with missing role {string}")
+	public void admin_sends_https_put_request_and_request_body_with_missing_role(String roleFields) throws Exception {
+		data = ExcelReader.readExcelData("User", roleFields);
+	      requestSpec = requestSpec.body(data.get("Body"));
+	      String endpoint = data.get("Endpoint").replace("{userId}", userId);
+	      response = ApiRequest.sendRequest(requestSpec,"PUT", endpoint);
+	}
+
+	
+	@Then("Admin receives {int} Bad Request Status with missing role field message")
+	public void admin_receives_bad_request_status_with_missing_role_field_message(Integer num) throws Exception {
+		String expectedMessage = data.get("ExpectedStatusMessage");
+	response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num)).body("message", equalTo(expectedMessage));
+			}
+	
+	
+	@When("Admin sends HTTPS PUT Request and request Body with mandatory fields and valid adminID and Mandatory program Id, batch Id ,role id, admin id, admin role program batch status")
+	public void admin_sends_https_put_request_and_request_body_with_mandatory_fields_and_valid_admin_id_and_mandatory_program_id_batch_id_role_id_admin_id_admin_role_program_batch_status() throws Exception {
+		
+		data = ExcelReader.readExcelData("User", "UpdateAdminProgramBatch_Valid");
+
+	    String body = data.get("Body");
+
+	     body = body.replace("{programIdd}", String.valueOf(programId) )
+	               .replace("{batchIdd}", String.valueOf(batchId));
+
+	    requestSpec = requestSpec.body(body);
+	      String endpoint = data.get("Endpoint").replace("{userId}", userId);
+	      response = ApiRequest.sendRequest(requestSpec,"PUT", endpoint);
+	}
+	
+	@When("Admin sends HTTPS PUT Request and request Body with mandatory fields and invalid adminID and Mandatory program Id, batch Id ,role id, admin id, admin role program batch status")
+	public void admin_sends_https_put_request_and_request_body_with_mandatory_fields_and_invalid_admin_id_and_mandatory_program_id_batch_id_role_id_admin_id_admin_role_program_batch_status() throws Exception {
+		data = ExcelReader.readExcelData("User", "UpdateAdminProgramBatch_InValid");
+
+	    String body = data.get("Body");
+
+	     body = body.replace("{programIdd}", String.valueOf(programId) )
+	               .replace("{batchIdd}", String.valueOf(batchId));
+
+	    requestSpec = requestSpec.body(body);
+	      response = ApiRequest.sendRequest(requestSpec,"PUT", data.get("Endpoint"));
+	}
+	
+
+	@Then("Admin receives {int} OK Status with response body and message")
+	public void admin_receives_ok_status_with_response_body_and_message(Integer num) {
+		
+		String expectedMessage = data.get("ExpectedStatusMessage").replace("U000",userId);
+
+		response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num)).body("message", equalTo(expectedMessage));
+			
+	}
+	
+	@When("Admin sends HTTPS PUT Request and request Body with missing mandatory fields program batch {string}")
+	public void admin_sends_https_put_request_and_request_body_with_missing_mandatory_fields_program_batch(String fields) throws Exception {
+		data = ExcelReader.readExcelData("User", fields);
+		String body = data.get("Body");
+
+	     body = body.replace("{programIdd}", String.valueOf(programId) )
+	               .replace("{batchIdd}", String.valueOf(batchId));
+
+	    requestSpec = requestSpec.body(body);
+	      String endpoint = data.get("Endpoint").replace("{userId}", userId);
+	      response = ApiRequest.sendRequest(requestSpec,"PUT", endpoint);
+	}
+
+	
+	@Then("Admin receives {int} Bad Request Status with message details")
+	public void admin_receives_bad_request_status_with_missing_details(Integer num) throws Exception {
+		String expectedMessage = data.get("ExpectedStatusMessage").trim();
+		String actualMessage = response.jsonPath().getString("message").trim();
+	response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num));
+	 Assert.assertEquals(actualMessage, expectedMessage, "Error message mismatch");
+			}
+	
+	
+	@When("Admin sends HTTPS PUT Request and request Body with login email and valid adminID")
+	public void admin_sends_https_put_request_and_request_body_with_login_email_and_valid_adminid() throws Exception {
+		
+		data = ExcelReader.readExcelData("User", "UpdateAdminLoginEmail_Valid");
+		requestSpec = requestSpec.body(data.get("Body"));
+	      String endpoint = data.get("Endpoint").replace("{userId}", userId);
+	      response = ApiRequest.sendRequest(requestSpec,"PUT", endpoint);
+	}
+	
+	@Then("Admin receives {int} OK Status with response body and updated message")
+	public void admin_receives_ok_status_with_response_body_and_updated_message(Integer num) {
+		
+		String expectedMessage = data.get("ExpectedStatusMessage").replace("U000",userId).trim();
+
+		response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num));
+		String actualMessage = response.asString().trim();
+		 Assert.assertEquals(actualMessage,expectedMessage,"Response message mismatch" );
+			
+	}
+	
+	@When("Admin sends HTTPS PUT Request and request Body with login email and invalid adminID")
+	public void admin_sends_https_put_request_and_request_body_with_login_email_and_invalid_admin_id() throws Exception {
+		data = ExcelReader.readExcelData("User", "UpdateAdminLoginEmail_InValid");
+		requestSpec = requestSpec.body(data.get("Body"));
+	      response = ApiRequest.sendRequest(requestSpec,"PUT",data.get("Endpoint"));
+	}
+	
+
+	@When("Admin sends HTTPS PUT Request and request Body with missing fields {string}")
+	public void admin_sends_https_put_request_and_request_body_with_missing_fields(String loginEmailFields) throws Exception {
+		data = ExcelReader.readExcelData("User", loginEmailFields);
+	    requestSpec = requestSpec.body(data.get("Body"));
+	      String endpoint = data.get("Endpoint").replace("{userId}", userId);
+	      response = ApiRequest.sendRequest(requestSpec,"PUT", endpoint);
+	}
+
 	
 	
 	//DELETE REQUEST
