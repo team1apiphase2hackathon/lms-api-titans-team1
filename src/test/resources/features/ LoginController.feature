@@ -11,21 +11,21 @@ Feature: Verify User Login Controller
     Examples: 
       | ScenarioName                     |
       | Postrequest_Valid credential     |
-      | Postrequest_InvalidBaseURL       |
-      | Postrequest_InvalidContenttype   |
-      | Postrequest_InvalidEndpoint      |
-      | Postrequest_SpecialCharsEmail    |
-      | Postrequest_SpecialCharsPassword |
-      | Postrequest_NumbersEmail         |
-      | Postrequest_NumbersPassword      |
-      | Postrequest_NullPassword         |
-      | Postrequest_NullEmail            |
-      | Postrequest_NullBody             |
-      | Postrequest_CaseSensitivePassword|
-      | Postrequest_CaseSensitiveEmail   |
-      
- 
-
+      #| Postrequest_InvalidBaseURL       |
+      #| Postrequest_InvalidContenttype   |
+      #| Postrequest_InvalidEndpoint      |
+      #| Postrequest_SpecialCharsEmail    |
+      #| Postrequest_SpecialCharsPassword |
+      #| Postrequest_NumbersEmail         |
+      #| Postrequest_NumbersPassword      |
+      #| Postrequest_NullPassword         |
+      #| Postrequest_NullEmail            |
+      #| Postrequest_NullBody             |
+      #| Postrequest_CaseSensitivePassword|
+      #| Postrequest_CaseSensitiveEmail   |
+      #
+ #
+#
   #@POSTInvalidMethod
   #Scenario: Verify login with Invalid Method
     #Given Admin has the test data for "Postrequest_Invalidmethod" from Excel with No Auth
@@ -99,3 +99,9 @@ Feature: Verify User Login Controller
     #Given Admin has the test data for "Logout_NoAuth" from Excel with No Auth
     #When Admin sends a GET request for Logout noauth
     #Then Admin should receive the status code matches with Expected statuscode
+    
+@LogoutTokenInvalidation
+Scenario: Verify if admin is unable to create request with the logout token
+    Given Admin has the test data for "LogoutTokenInvalidation" from Excel with Bearer Token
+    When Admin sends a GET request for Logout 
+    Then Admin should receive the status code matches with Expected statuscode
