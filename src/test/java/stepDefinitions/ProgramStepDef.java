@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import endpoints.ProgramSendRequest;
+
+import http.ProgramSendRequest;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;

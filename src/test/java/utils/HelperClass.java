@@ -1,6 +1,6 @@
 package utils;
 
-import endpoints.ApiRequest;
+import http.ApiRequest;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 

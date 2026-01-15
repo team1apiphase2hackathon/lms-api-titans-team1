@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 import java.util.Map;
 
-import endpoints.ApiRequest;
+import http.ApiRequest;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;

@@ -9,7 +9,7 @@ import java.util.Map;
 
 import org.testng.Assert;
 
-import endpoints.ApiRequest;
+import http.ApiRequest;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
