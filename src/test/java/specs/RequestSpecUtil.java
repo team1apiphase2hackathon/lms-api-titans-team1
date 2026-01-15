@@ -4,7 +4,6 @@ package specs;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-
 import config.ConfigReader;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
@@ -15,74 +14,63 @@ public class RequestSpecUtil {
 
 	private static PrintStream logStream;
 
-	
-    public static void logScenarioName(String scenarioName) {
-        initializeLogStream();
-        logStream.println("\n==================================================");
-        logStream.println("SCENARIO: " + scenarioName);
-        logStream.println("==================================================\n");
-        logStream.flush(); 
-    }
-    public static RequestSpecification getRequestSpec() {
-    	initializeLogStream();
-    	String currentToken = utils.GlobalTestData.token;
-        return new RequestSpecBuilder()
-                .setBaseUri(ConfigReader.get("base.url"))
-                .addHeader("Authorization", "Bearer " + currentToken)
-                .addHeader("Content-Type", "application/json")
-                .addFilter(RequestLoggingFilter.logRequestTo(logStream))
-                .addFilter(ResponseLoggingFilter.logResponseTo(logStream))
-                .build();
-    }
-    
- 
-    public static RequestSpecification getRequestSpecWithoutAuth() {
-    	initializeLogStream();
-        return new RequestSpecBuilder()
-                .setBaseUri(ConfigReader.get("base.url"))
-                .addHeader("Content-Type", "application/json")
-                .addFilter(RequestLoggingFilter.logRequestTo(logStream))
-                .addFilter(ResponseLoggingFilter.logResponseTo(logStream))
-                .build();
-    }
-    public static RequestSpecification getRequestSpecWithCustomToken(String customToken) {
-        initializeLogStream();
-        return new RequestSpecBuilder()
-                .setBaseUri(ConfigReader.get("base.url"))
-                .addHeader("Authorization", "Bearer " + customToken)
-                .addHeader("Content-Type", "application/json")
-                .addFilter(RequestLoggingFilter.logRequestTo(logStream))
-                .addFilter(ResponseLoggingFilter.logResponseTo(logStream))
-                .build();
-    }
-	public static RequestSpecification getRequestSpecInvalidAuth() { initializeLogStream();
-    return new RequestSpecBuilder()
-            .setBaseUri(ConfigReader.get("base.url"))
-            .addHeader("Authorization", "Bearer " )
-            .addHeader("Content-Type", "application/json")
-            .addFilter(RequestLoggingFilter.logRequestTo(logStream))
-            .addFilter(ResponseLoggingFilter.logResponseTo(logStream))
-            .build();
+	public static RequestSpecification getRequestSpec() {
+		initializeLogStream();
+		String currentToken = utils.GlobalTestData.token;
+		return new RequestSpecBuilder().setBaseUri(ConfigReader.get("base.url"))
+				.addHeader("Authorization", "Bearer " + currentToken).addHeader("Content-Type", "application/json")
+				.addFilter(RequestLoggingFilter.logRequestTo(logStream))
+				.addFilter(ResponseLoggingFilter.logResponseTo(logStream)).build();
 	}
-	//Initialize the file stream once
-    private static void initializeLogStream() {
-        if (logStream == null) {
-            synchronized (RequestSpecUtil.class) {
-                if (logStream == null) {
-                    try {
-                        String filePath = ConfigReader.get("LogFilePath");
-                        File logFile = new File(filePath);
-                        if (logFile.getParentFile() != null && !logFile.getParentFile().exists()) {
-                            logFile.getParentFile().mkdirs();
-                        }
-                        // 'false' overwrites the file every time you run the suite
-                        logStream = new PrintStream(new FileOutputStream(filePath, false));
-                    } catch (Exception e) {
-                        throw new RuntimeException("❌ Failed to initialize log file", e);
-                    }
-                }
-            }
-        }
-    }
-}
 
+	public static RequestSpecification getRequestSpecWithoutAuth() {
+		initializeLogStream();
+		return new RequestSpecBuilder().setBaseUri(ConfigReader.get("base.url"))
+				.addHeader("Content-Type", "application/json").addFilter(RequestLoggingFilter.logRequestTo(logStream))
+				.addFilter(ResponseLoggingFilter.logResponseTo(logStream)).build();
+	}
+
+	public static RequestSpecification getRequestSpecWithCustomToken(String customToken) {
+		initializeLogStream();
+		return new RequestSpecBuilder().setBaseUri(ConfigReader.get("base.url"))
+				.addHeader("Authorization", "Bearer " + customToken).addHeader("Content-Type", "application/json")
+				.addFilter(RequestLoggingFilter.logRequestTo(logStream))
+				.addFilter(ResponseLoggingFilter.logResponseTo(logStream)).build();
+	}
+
+	public static RequestSpecification getRequestSpecInvalidAuth() {
+		initializeLogStream();
+		return new RequestSpecBuilder().setBaseUri(ConfigReader.get("base.url")).addHeader("Authorization", "Bearer ")
+				.addHeader("Content-Type", "application/json").addFilter(RequestLoggingFilter.logRequestTo(logStream))
+				.addFilter(ResponseLoggingFilter.logResponseTo(logStream)).build();
+	}
+
+	// Initialize the file stream once
+	private static void initializeLogStream() {
+		if (logStream == null) {
+			synchronized (RequestSpecUtil.class) {
+				if (logStream == null) {
+					try {
+						String filePath = ConfigReader.get("LogFilePath");
+						File logFile = new File(filePath);
+						if (logFile.getParentFile() != null && !logFile.getParentFile().exists()) {
+							logFile.getParentFile().mkdirs();
+						}
+						logStream = new PrintStream(new FileOutputStream(filePath, false));
+					} catch (Exception e) {
+						throw new RuntimeException("Failed to initialize log file", e);
+					}
+				}
+			}
+		}
+	}
+
+	public static void logScenarioName(String scenarioName) {
+		initializeLogStream();
+		logStream.println("\n==================================================");
+		logStream.println("SCENARIO: " + scenarioName);
+		logStream.println("==================================================\n");
+		logStream.flush();
+	}
+
+}

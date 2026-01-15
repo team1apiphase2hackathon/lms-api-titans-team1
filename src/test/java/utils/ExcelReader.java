@@ -13,20 +13,20 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ExcelReader {
-public static String filePath = "src/test/resources/Team1_lms_TestDataSheet.xlsx";
-	
+	public static String filePath = "src/test/resources/Team1_lms_TestDataSheet.xlsx";
+
 	public static List<Map<String, String>> getAllSheetData(String sheetName) throws IOException {
 		FileInputStream fis = new FileInputStream(filePath);
 		XSSFWorkbook wb = new XSSFWorkbook(fis);
 		XSSFSheet sheet = wb.getSheet(sheetName);
-		DataFormatter formatter = new DataFormatter();	
+		DataFormatter formatter = new DataFormatter();
 		List<Map<String, String>> listData = new ArrayList<>();
-		
+
 		Row header = sheet.getRow(0);
 		for (int r = 1; r <= sheet.getLastRowNum(); r++) {
 			Row row = sheet.getRow(r);
-			Map<String, String>rowData = new HashMap<>();
-			for (int c = 0; c <= row.getLastCellNum(); c++) {	
+			Map<String, String> rowData = new HashMap<>();
+			for (int c = 0; c <= row.getLastCellNum(); c++) {
 				String key = formatter.formatCellValue(header.getCell(c)).trim();
 				String value = formatter.formatCellValue(row.getCell(c)).trim();
 				rowData.put(key, value);
@@ -36,7 +36,7 @@ public static String filePath = "src/test/resources/Team1_lms_TestDataSheet.xlsx
 		wb.close();
 		return listData;
 	}
-	
+
 	public static Map<String, String> readExcelData(String sheetName, String requestType) throws IOException {
 		List<Map<String, String>> data = getAllSheetData(sheetName);
 		for (Map<String, String> row : data) {
@@ -46,5 +46,5 @@ public static String filePath = "src/test/resources/Team1_lms_TestDataSheet.xlsx
 		}
 		return null;
 	}
-	
+
 }

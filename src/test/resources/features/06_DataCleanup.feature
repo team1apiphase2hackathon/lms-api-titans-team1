@@ -1,26 +1,20 @@
-
-
-
 Feature: Data Clean up
 
-
-   @delete
-   Scenario: Check if admin able to delete a admin with valid user
+  @delete
+  Scenario: Check if admin able to delete a admin with valid user
     When Admin sends DELETE Request for the LMS API endpoint  and  valid user
     Then Admin receives 200 OK Status with response body
-    
-     @Program
+
+  @Program
   Scenario Outline: Verify if admin is able to DELETE a ProgramByProgramId using DELETE method
     Given Admin has a valid authorization token set
     When Admin sends DELETE request to delete programById with payload for "<ScenarioName>" using dataSheet
     Then Admin verifies the response payload with expected output from the data sheet for Delete Program ByProgramId
 
-    Examples:
-      |			ScenarioName				|
-      |	DeleteProgramById_with_valid_ProgramName	|
-      
-      
-      
+    Examples: 
+      | ScenarioName                             |
+      | DeleteProgramById_with_valid_ProgramName |
+
   @Logout
   Scenario Outline: Verify Logout functionality with Auth
     Given Admin has the test data for "<ScenarioName>" from Excel with Bearer Token
