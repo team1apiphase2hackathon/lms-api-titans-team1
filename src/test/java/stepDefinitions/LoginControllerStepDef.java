@@ -42,13 +42,9 @@ public class LoginControllerStepDef extends GlobalTestData {
 	public void admin_should_receive_the_status_code_as_defined_in_excel() {
 		int expectedStatusCode = Integer.parseInt(testData.get("ExpectedStatusCode"));
 		String currentScenario = testData.get("ScenarioName");
-		// Basic status code validation
 		response.then().spec(ResponseSpecUtil.status(expectedStatusCode));
-		// Content type validation
 		String contentType = response.getHeader("Content-Type");
-
 		if (contentType != null && contentType.contains("application/json")) {
-			// Performance Check (Ensure response is under 2 seconds)
 			response.then().time(lessThan(2000L));
 			if (response.getStatusCode() == 200) {
 				if (currentScenario != null && currentScenario.trim().equals("Postrequest_Valid credential")) {
@@ -62,9 +58,7 @@ public class LoginControllerStepDef extends GlobalTestData {
 				}
 
 			}
-		} else {
-			System.out.println("Skipping JSON validations for Scenario: " + currentScenario);
-		}
+		} 
 	}
 
 	@Then("the response should match the expected validation message from Excel")
@@ -138,7 +132,6 @@ public class LoginControllerStepDef extends GlobalTestData {
 		if (response.getStatusCode() == 200 && scenario.contains("Valid")) {
 			response.then().assertThat()
 					.body(matchesJsonSchemaInClasspath("schemas/Login/PostResetPasswordResponseSchema.json"));
-			System.out.println("✅ Reset Password Schema Validated");
 		}
 
 	}
