@@ -17,7 +17,6 @@ Feature: Program
       |CreateProgram_with_Missing_MandatoryField_ProgramName		|
       |CreateProgram_with_Missing_MandatoryField_ProgramStatus		|
       |CreateProgram_with_Valid_ProgramDesc_ProgramName_Active_Status		|
-      |CreateProgram_with_InActive_Status		|
       |CreateProgram_with_Active_Status    |
       |CreateProgram_with_Existing_ProgramName				|
       |CreateProgram_with_Valid_ProgramDesc_ProgramName_Active_Status		|

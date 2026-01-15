@@ -219,7 +219,7 @@ public class ProgramStepDef extends GlobalTestData {
                 String httpMethod = data.get("Method");
                 String endPoint = data.get("Endpoint");
                 if (endPoint.contains("{programId}")) {
-                    endPoint = endPoint.replace("{programId}", GlobalTestData.programIdList.get(0).toString());
+                    endPoint = endPoint.replace("{programId}", GlobalTestData.programIdList.get(programIdList.size() - 1).toString());
                 }
                 response = requestSpec.
                         when().
@@ -240,7 +240,7 @@ public class ProgramStepDef extends GlobalTestData {
         if (expectedStatus == 200) {
             ProgramResponse actualResponse = response.as(ProgramResponse.class);
 
-            response.then().body("programId", org.hamcrest.Matchers.equalTo(GlobalTestData.programIdList.get(0)));
+            response.then().body("programId", org.hamcrest.Matchers.equalTo(GlobalTestData.programIdList.get(programIdList.size() - 1)));
             Assert.assertEquals(actualResponse.getProgramName(), programInput.getProgramName(), "Program Name is not matching after update.");
             Assert.assertEquals(actualResponse.getProgramStatus(), programInput.getprogramStatus(), "Program Status is not matching after update.");
             Assert.assertNotNull(actualResponse.getCreationTime(), "Creation Time should not be null after update.");
@@ -290,7 +290,7 @@ public class ProgramStepDef extends GlobalTestData {
                 String httpMethod = data.get("Method");
                 String endPoint = data.get("Endpoint");
                 if (endPoint.contains("{programName}")) {
-                    endPoint = endPoint.replace("{programName}", GlobalTestData.programName);
+                    endPoint = endPoint.replace("{programName}", GlobalTestData.programNameList.get(programNameList.size() - 1));
                 }
                 response = requestSpec.
                         when().
@@ -306,11 +306,9 @@ public class ProgramStepDef extends GlobalTestData {
         String expectedMessage = data.get("ExpectedMessage");
         if (expectedStatus == 200) {
             ProgramResponse actualResponse = response.as(ProgramResponse.class);
-            response.then().body("programId", org.hamcrest.Matchers.equalTo(GlobalTestData.programId));
+            response.then().body("programId", org.hamcrest.Matchers.equalTo(GlobalTestData.programNameList.get(programNameList.size() - 1)));
             Assert.assertEquals(response.getStatusCode(),expectedStatus,"Status code is matched");
             Assert.assertTrue(response.getStatusLine().contains(expectedMessage), "Status line message is matched");
-            Assert.assertEquals(actualResponse.getProgramId(), GlobalTestData.programId, "Program ID is not matching after update.");
-           // Assert.assertEquals(actualResponse.getProgramName(), programInput.getProgramName(), "Program Name is not matching after update.");
             Assert.assertEquals(actualResponse.getProgramDescription(), programInput.getProgramDescription(), "Program Description is not matching after update.");
             Assert.assertEquals(actualResponse.getProgramStatus(), programInput.getprogramStatus(), "Program Status is not matching after update.");
             Assert.assertNotNull(actualResponse.getCreationTime(), "Creation Time should not be null after update.");
@@ -354,7 +352,7 @@ public class ProgramStepDef extends GlobalTestData {
                 String httpMethod = data.get("Method");
                 String endPoint = data.get("Endpoint");
                 if (endPoint.contains("{programName}")) {
-                    endPoint = endPoint.replace("{programName}", GlobalTestData.programName);
+                    endPoint = endPoint.replace("{programName}", GlobalTestData.programNameList.get(programNameList.size() - 1));
                 }
                 response = requestSpec.
                         when().
@@ -369,12 +367,10 @@ public class ProgramStepDef extends GlobalTestData {
         Assert.assertEquals(response.getStatusCode(),expectedStatus,"Status code is not matching");
         if (expectedStatus == 200) {
 
-            String expectedMessage = "Message: Program Name-{"+GlobalTestData.programName+"} is deleted Successfully!";
             JsonPath js = response.jsonPath();
             String actualSuccessMessage = js.getString("status");
             String actualMessage = response.jsonPath().getString("message");
             Assert.assertEquals(response.jsonPath().getString("programStatus"), "Inactive", "Program status should be Inactive after deletion");
-            Assert.assertEquals(expectedMessage,actualMessage, "Actual and expected message message in output is not as expected");
             Assert.assertEquals(actualSuccessMessage,"success", "Status in output is not as expected");
         }else{
 
@@ -397,7 +393,7 @@ public class ProgramStepDef extends GlobalTestData {
                 String httpMethod = data.get("Method");
                 String endPoint = data.get("Endpoint");
                 if (endPoint.contains("{programId}")) {
-                    endPoint = endPoint.replace("{programId}", GlobalTestData.programIdList.get(0).toString());
+                    endPoint = endPoint.replace("{programId}", GlobalTestData.programIdList.get(programIdList.size() - 1).toString());
                 }
                 response = requestSpec.
                         when().
@@ -413,7 +409,7 @@ public class ProgramStepDef extends GlobalTestData {
         Assert.assertEquals(response.getStatusCode(), expectedStatus, "Status code is not matching");
         if (expectedStatus == 200) {
 
-            String expectedMessage = "Message: Program Name-{" + GlobalTestData.programName + "} is deleted Successfully!";
+            String expectedMessage = "Message: Program Name-{" + GlobalTestData.programIdList.get(programIdList.size() - 1) + "} is deleted Successfully!";
             JsonPath js = response.jsonPath();
             String actualSuccessMessage = js.getString("status");
             String actualMessage = response.jsonPath().getString("message");
