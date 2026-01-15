@@ -10,32 +10,12 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.specification.RequestSpecification;
-import utils.TestDataUtil;
 
 public class RequestSpecUtil {
 
 	private static PrintStream logStream;
 
-	//Initialize the file stream once
-    private static void initializeLogStream() {
-        if (logStream == null) {
-            synchronized (RequestSpecUtil.class) {
-                if (logStream == null) {
-                    try {
-                        String filePath = ConfigReader.get("LogFilePath");
-                        File logFile = new File(filePath);
-                        if (logFile.getParentFile() != null && !logFile.getParentFile().exists()) {
-                            logFile.getParentFile().mkdirs();
-                        }
-                        // 'false' overwrites the file every time you run the suite
-                        logStream = new PrintStream(new FileOutputStream(filePath, false));
-                    } catch (Exception e) {
-                        throw new RuntimeException("❌ Failed to initialize log file", e);
-                    }
-                }
-            }
-        }
-    }
+	
     public static void logScenarioName(String scenarioName) {
         initializeLogStream();
         logStream.println("\n==================================================");
@@ -74,6 +54,35 @@ public class RequestSpecUtil {
                 .addFilter(RequestLoggingFilter.logRequestTo(logStream))
                 .addFilter(ResponseLoggingFilter.logResponseTo(logStream))
                 .build();
+    }
+	public static RequestSpecification getRequestSpecInvalidAuth() { initializeLogStream();
+    return new RequestSpecBuilder()
+            .setBaseUri(ConfigReader.get("base.url"))
+            .addHeader("Authorization", "Bearer " )
+            .addHeader("Content-Type", "application/json")
+            .addFilter(RequestLoggingFilter.logRequestTo(logStream))
+            .addFilter(ResponseLoggingFilter.logResponseTo(logStream))
+            .build();
+	}
+	//Initialize the file stream once
+    private static void initializeLogStream() {
+        if (logStream == null) {
+            synchronized (RequestSpecUtil.class) {
+                if (logStream == null) {
+                    try {
+                        String filePath = ConfigReader.get("LogFilePath");
+                        File logFile = new File(filePath);
+                        if (logFile.getParentFile() != null && !logFile.getParentFile().exists()) {
+                            logFile.getParentFile().mkdirs();
+                        }
+                        // 'false' overwrites the file every time you run the suite
+                        logStream = new PrintStream(new FileOutputStream(filePath, false));
+                    } catch (Exception e) {
+                        throw new RuntimeException("❌ Failed to initialize log file", e);
+                    }
+                }
+            }
+        }
     }
 }
 

@@ -11,7 +11,7 @@ Given Admin has a valid authorization token in user controller
     When Admin sends HTTPS POST Request and request Body with mandatory fields and admin role                          
     Then Admin receives 201 Created Status with response body
     
-   @post 
+   @post @e2e
    Scenario: Check if admin able to create a admin with valid endpoint and request body with multiple roles
     When Admin sends HTTPS POST Request and request Body with multiple roles                          
     Then Admin receives 201 Created Status with response body and schema validation
@@ -142,7 +142,7 @@ Given Admin has a valid authorization token in user controller
     |UpdateAdminRoleStatus_Valid_missingRoleId|
     |UpdateAdminRoleStatus_Valid_missingRoleStatus|
     
-    @put
+    @put @e2e
    Scenario: Check if admin able to assign admin to program / batch with valid admin Id and request body
     When Admin sends HTTPS PUT Request and request Body with mandatory fields and valid adminID and Mandatory program Id, batch Id ,role id, admin id, admin role program batch status                       
     Then Admin receives 200 OK Status with response body and message
@@ -276,11 +276,7 @@ Given Admin has a valid authorization token in user controller
     Then Admin receives 200 OK Status with response body
     
     
-    @delete
-   Scenario: Check if admin able to delete a admin with valid user
-    When Admin sends DELETE Request for the LMS API endpoint  and  valid user
-    Then Admin receives 200 OK Status with response body
-    
+ 
        @delete 
    Scenario: Check if admin able to delete a admin with valid admin user
     When Admin sends DELETE Request for the LMS API endpoint  and  valid admin user

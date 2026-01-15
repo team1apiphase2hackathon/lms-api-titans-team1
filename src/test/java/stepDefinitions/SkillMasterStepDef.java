@@ -14,7 +14,6 @@ import io.restassured.specification.RequestSpecification;
 import specs.RequestSpecUtil;
 import specs.ResponseSpecUtil;
 import utils.ExcelReader;
-import utils.ExternalTestDataStore;
 import utils.GlobalTestData;
 
 public class SkillMasterStepDef extends GlobalTestData{

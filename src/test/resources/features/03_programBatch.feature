@@ -1,6 +1,7 @@
+@batch
 Feature: Program Batch module for LMS API 
 
-@Post
+@Post @e2e
 Scenario Outline: Check if Admin is able to create batch with valid batch name and description
 Given Admin create POST request with valid "<batch_name>" format and "<batch_description>"
 When Admin sends POST request to create program batch
@@ -8,12 +9,12 @@ Then Admin receives created status with response body
 
 Examples:
 | batch_name | batch_description |
-| SDETTeam3111 | abcd     |
+| SDETTeam3113 | abcd     |
 #| SDETTeam012 | ProgramBatchDescription12 |
 #| SDETTeam013 | TestBatch11  |
 
 @Post
-Scenario: Check if Admin is able to create batch with invalid input
+Scenario Outline: Check if Admin is able to create batch with invalid input
 Given Admin create POST request with invalid input for "<scenario>" from excel sheet
 When Admin sends POST request to create program batch
 Then Admin receives expected status code with error message
@@ -123,7 +124,7 @@ When Admin sends GET request to retrieve the batch
 Then Admin receives success code with GET response body
 
 @GetByBatchId
-Scenario: Check if Admin is able to retrieve batch by batchId with invalid input 
+Scenario Outline: Check if Admin is able to retrieve batch by batchId with invalid input 
 Given Admin create GET request by BatchId with invalid input for "<scenario>" from excel sheet
 When Admin sends GET request to retrieve the batch
 Then Admin receives expected status code with error message
@@ -140,7 +141,7 @@ When Admin sends GET request to retrieve the batch
 Then Admin receives success code with GET response body having given batch name
 
 @GetByBatchName
-Scenario: Check if Admin is able to retrieve batch by BatchName with invalid input 
+Scenario Outline: Check if Admin is able to retrieve batch by BatchName with invalid input 
 Given Admin create GET request by BatchName with invalid input for "<scenario>" from excel sheet
 When Admin sends GET request to retrieve the batch
 Then Admin receives expected status code with error message
@@ -157,7 +158,7 @@ When Admin sends GET request to retrieve the batch
 Then Admin receives success code with GET response body having given programId
 
 @GetByProgramId
-Scenario: Check if Admin is able to retrieve batch by programId with invalid input 
+Scenario Outline: Check if Admin is able to retrieve batch by programId with invalid input 
 Given Admin create GET request by programId with invalid input for scenario "<scenario>" from excel sheet
 When Admin sends GET request to retrieve the batch
 Then Admin receives expected status code with error message
@@ -199,7 +200,7 @@ When Admin sends PUT request to update the batch
 Then Admin receives expected status code with error message
 
 @PutBatchByBatchId
-Scenario: Check if Admin is able to update batch with invalid input 
+Scenario Outline: Check if Admin is able to update batch with invalid input 
 Given Admin create PUT request with invalid input for each "<scenario>" from excel sheet
 When Admin sends PUT request to update the batch
 Then Admin receives expected status code with error message
