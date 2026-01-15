@@ -6,7 +6,7 @@ Feature: Skill Master
 Background:
 Given Admin has a valid authorization token
 
-  @post 
+  @post @e2e
   Scenario: Check if admin able to create a New Skill Master with valid endpoint and request body (non existing values)
     When Admin sends HTTPS POST Request and  request Body with mandatory 
     Then Admin receives 201 Created Status with response body.    

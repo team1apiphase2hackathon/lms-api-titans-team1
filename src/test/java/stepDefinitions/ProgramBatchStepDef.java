@@ -396,7 +396,7 @@ public class ProgramBatchStepDef extends GlobalTestData{
         if (!scenario.contains("UpdateBatchName")) {
         	batchData.setBatchName(batchName);
         }
-        batchData.setProgramId(programIdList.getLast());
+        batchData.setProgramId(programIdList.get(programIdList.size()-1));
         batchData.setProgramName(programName);
 		requestSpec = given()
                 .spec(RequestSpecUtil.getRequestSpec())

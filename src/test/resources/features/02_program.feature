@@ -1,6 +1,7 @@
+@programmodule
 Feature: Program
 
-  @Program
+  @Program @e2e
   Scenario Outline: Verify if admin is able to create a Program
     Given Admin has a valid authorization token set
     When Admin sends POST request to create program with different payload for "<ScenarioName>" from dataSheet
