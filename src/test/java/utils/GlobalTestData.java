@@ -7,10 +7,10 @@ public class GlobalTestData {
 	protected static List<Integer> batchIds = new ArrayList<>();
 	protected static List<Integer> programIdList = new ArrayList<>();
 
-	protected static int batchId = 170;
-	protected static String batchName = "Batch01";
-	protected static int programId = 138;
-	protected static String programName = "Java Programming";
+	protected static int batchId;
+	protected static String batchName;
+	protected static int programId;
+	protected static String programName;
 	protected static String skillId;
     protected static String skillName;
 	protected static String userId;
@@ -20,6 +20,7 @@ public class GlobalTestData {
 	protected static String token;
 
 	public GlobalTestData() {
+
 		
 	}
 }
