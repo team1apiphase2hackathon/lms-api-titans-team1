@@ -45,9 +45,10 @@ public class RequestSpecUtil {
     }
     public static RequestSpecification getRequestSpec() {
     	initializeLogStream();
+    	String currentToken = utils.GlobalTestData.token;
         return new RequestSpecBuilder()
                 .setBaseUri(ConfigReader.get("base.url"))
-                .addHeader("Authorization", "Bearer " + TestDataUtil.getToken())
+                .addHeader("Authorization", "Bearer " + currentToken)
                 .addHeader("Content-Type", "application/json")
                 .addFilter(RequestLoggingFilter.logRequestTo(logStream))
                 .addFilter(ResponseLoggingFilter.logResponseTo(logStream))
@@ -64,6 +65,15 @@ public class RequestSpecUtil {
                 .addFilter(ResponseLoggingFilter.logResponseTo(logStream))
                 .build();
     }
-    
+    public static RequestSpecification getRequestSpecWithCustomToken(String customToken) {
+        initializeLogStream();
+        return new RequestSpecBuilder()
+                .setBaseUri(ConfigReader.get("base.url"))
+                .addHeader("Authorization", "Bearer " + customToken)
+                .addHeader("Content-Type", "application/json")
+                .addFilter(RequestLoggingFilter.logRequestTo(logStream))
+                .addFilter(ResponseLoggingFilter.logResponseTo(logStream))
+                .build();
+    }
 }
 

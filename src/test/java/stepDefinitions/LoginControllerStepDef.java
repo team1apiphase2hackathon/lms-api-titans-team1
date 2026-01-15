@@ -51,7 +51,6 @@ public class LoginControllerStepDef extends GlobalTestData {
 			// Performance Check (Ensure response is under 2 seconds)
 			response.then().time(lessThan(2000L));
 			if (response.getStatusCode() == 200) {
-				// String currentScenario = testData.get("ScenarioName");
 				if (currentScenario != null && currentScenario.trim().equals("Postrequest_Valid credential")) {
 					response.then().assertThat()
 							.body(matchesJsonSchemaInClasspath("schemas/Login/PostUserSignInResponseSchema.json"));
@@ -81,7 +80,14 @@ public class LoginControllerStepDef extends GlobalTestData {
 		testData = ExcelReader.readExcelData("AdminLogin", scenarioName);
 		RequestSpecUtil.logScenarioName(scenarioName);
 
-		requestSpec = given().spec(RequestSpecUtil.getRequestSpec().body(testData.get("Body")));
+		if (scenarioName.equalsIgnoreCase("LogoutTokenInvalidation")) {
+			String excelToken = testData.get("Token");
+
+			requestSpec = given().spec(RequestSpecUtil.getRequestSpecWithCustomToken(excelToken))
+					.body(testData.get("Body"));
+		} else {
+			requestSpec = given().spec(RequestSpecUtil.getRequestSpec()).body(testData.get("Body"));
+		}
 	}
 
 	@When("Admin sends a GET request instead of POST for SignIn InvalidMethod")
