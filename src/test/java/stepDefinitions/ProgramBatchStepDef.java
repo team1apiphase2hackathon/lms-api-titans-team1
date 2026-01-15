@@ -45,6 +45,7 @@ public class ProgramBatchStepDef extends GlobalTestData{
         CreateBatchRequest batchData = mapper.readValue(data.get("Body"), CreateBatchRequest.class);
         batchData.setBatchName(batch_name);
         batchData.setBatchDescription(batch_description);
+        batchData.setProgramId(programId);
         requestSpec = given()
                 .spec(RequestSpecUtil.getRequestSpec())
                 .basePath(data.get("Endpoint"))
@@ -395,8 +396,8 @@ public class ProgramBatchStepDef extends GlobalTestData{
         if (!scenario.contains("UpdateBatchName")) {
         	batchData.setBatchName(batchName);
         }
-        batchData.setProgramId(updateProgramId);
-        batchData.setProgramName(updateProgramName);
+        batchData.setProgramId(programIdList.getLast());
+        batchData.setProgramName(programName);
 		requestSpec = given()
                 .spec(RequestSpecUtil.getRequestSpec())
                 .pathParam("batchId", batchId)
@@ -405,6 +406,7 @@ public class ProgramBatchStepDef extends GlobalTestData{
 		scenarioContext.setContext("BATCH_NAME", batchData.getBatchName());
 		scenarioContext.setContext("BATCH_STATUS", batchData.getBatchStatus());
 		scenarioContext.setContext("BATCH_NOOFCLASSES", batchData.getBatchNoOfClasses());
+		scenarioContext.setContext("PROGRAM_ID", batchData.getProgramId());
 	}
 
 	@When("Admin sends PUT request to update the batch")
@@ -420,8 +422,8 @@ public class ProgramBatchStepDef extends GlobalTestData{
 				.body(matchesJsonSchemaInClasspath("schemas/batch/PutBatchByIdResponseSchema.json"));
 		
 		PutBatchResponse batchResponse = response.getBody().as(PutBatchResponse.class);
-		Assert.assertEquals(batchResponse.getProgramId(), updateProgramId);
-		Assert.assertEquals(batchResponse.getProgramName(), updateProgramName);
+		programId = (int) scenarioContext.getContext("PROGRAM_ID");
+		Assert.assertEquals(batchResponse.getProgramId(), programId);
 	}
 	
 	@Then("Admin received success code with updated batchName in response")

@@ -41,7 +41,7 @@ public class PutBatchRequest {
 		this.batchStatus = batchStatus;
 	}
 	
-	public double getProgramId() {
+	public int getProgramId() {
 		return programId;
 	}
 	
