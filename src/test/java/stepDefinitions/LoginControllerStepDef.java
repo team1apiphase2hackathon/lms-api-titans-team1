@@ -13,6 +13,8 @@ import specs.RequestSpecUtil;
 import specs.ResponseSpecUtil;
 import utils.ExcelReader;
 import utils.GlobalTestData;
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
+import static org.hamcrest.Matchers.*;
 
 public class LoginControllerStepDef extends GlobalTestData {
 
@@ -39,19 +41,31 @@ public class LoginControllerStepDef extends GlobalTestData {
 	@Then("Admin should receive the status code as defined in Excel")
 	public void admin_should_receive_the_status_code_as_defined_in_excel() {
 		int expectedStatusCode = Integer.parseInt(testData.get("ExpectedStatusCode"));
-
+		String currentScenario = testData.get("ScenarioName");
+		// Basic status code validation
 		response.then().spec(ResponseSpecUtil.status(expectedStatusCode));
-		if (response.getStatusCode() == 200) {
-			String currentScenario = testData.get("ScenarioName");
-			if (currentScenario != null && currentScenario.trim().equals("Postrequest_Valid credential")) {
-				String capturedToken = response.jsonPath().getString("token");
-				if (capturedToken != null) {
-					token = capturedToken;
+		// Content type validation
+		String contentType = response.getHeader("Content-Type");
+
+		if (contentType != null && contentType.contains("application/json")) {
+			// Performance Check (Ensure response is under 2 seconds)
+			response.then().time(lessThan(2000L));
+			if (response.getStatusCode() == 200) {
+				// String currentScenario = testData.get("ScenarioName");
+				if (currentScenario != null && currentScenario.trim().equals("Postrequest_Valid credential")) {
+					response.then().assertThat()
+							.body(matchesJsonSchemaInClasspath("schemas/Login/PostUserSignInResponseSchema.json"));
+
+					String capturedToken = response.jsonPath().getString("token");
+					if (capturedToken != null) {
+						token = capturedToken;
+					}
 				}
+
 			}
-
+		} else {
+			System.out.println("Skipping JSON validations for Scenario: " + currentScenario);
 		}
-
 	}
 
 	@Then("the response should match the expected validation message from Excel")
@@ -88,10 +102,15 @@ public class LoginControllerStepDef extends GlobalTestData {
 	@When("Admin sends the post request for ForgotPassword")
 	public void admin_sends_the_post_request_for_forgot_password() {
 		String endpoint = testData.get("Endpoint");
+		String scenario = testData.get("ScenarioName");
 		if (testData.get("ScenarioName").contains("ForgotPassword_InvalidContentType")) {
 			requestSpec.contentType("text/plain");
 		}
 		response = requestSpec.when().post(endpoint);
+		if (response.getStatusCode() == 200 && scenario.contains("Valid")) {
+			response.then().assertThat()
+					.body(matchesJsonSchemaInClasspath("schemas/Login/PostForgotPasswordResponseSchema.json"));
+		}
 	}
 
 	@Then("the response should match the expected validation message")
@@ -105,10 +124,17 @@ public class LoginControllerStepDef extends GlobalTestData {
 	@When("Admin sends a POST request with Authorization for ResetPassword")
 	public void admin_sends_a_post_request_with_authorization_for_reset_password() {
 		String endpoint = testData.get("Endpoint");
+		String scenario = testData.get("ScenarioName");
 		if (testData.get("ScenarioName").contains("ResetPassword_InvalidContentType")) {
 			requestSpec.contentType("text/plain");
 		}
 		response = requestSpec.when().post(endpoint);
+		if (response.getStatusCode() == 200 && scenario.contains("Valid")) {
+			response.then().assertThat()
+					.body(matchesJsonSchemaInClasspath("schemas/Login/PostResetPasswordResponseSchema.json"));
+			System.out.println("✅ Reset Password Schema Validated");
+		}
+
 	}
 
 	@When("Admin sends the post request for ResetPasswordNoAuth")
