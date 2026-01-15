@@ -16,8 +16,10 @@ import io.cucumber.java.en.When;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import requestPojo.ProgramBatchRequest;
-import responsePojo.ProgramBatchResponse;
+import requestPojo.CreateBatchRequest;
+import requestPojo.PutBatchRequest;
+import responsePojo.CreateBatchResponse;
+import responsePojo.PutBatchResponse;
 import specs.RequestSpecUtil;
 import specs.ResponseSpecUtil;
 import utils.ExcelReader;
@@ -40,7 +42,7 @@ public class ProgramBatchStepDef extends GlobalTestData{
 	public void admin_create_post_request_with_valid_format_and(String batch_name, String batch_description) throws IOException {
 		data = ExcelReader.readExcelData("Batch", "CreateBatch_Valid_Request");
 		ObjectMapper mapper = new ObjectMapper();
-        ProgramBatchRequest batchData = mapper.readValue(data.get("Body"), ProgramBatchRequest.class);
+        CreateBatchRequest batchData = mapper.readValue(data.get("Body"), CreateBatchRequest.class);
         batchData.setBatchName(batch_name);
         batchData.setBatchDescription(batch_description);
         requestSpec = given()
@@ -62,7 +64,7 @@ public class ProgramBatchStepDef extends GlobalTestData{
 					.statusCode(Integer.parseInt(data.get("ExpectedStatusCode")))
 					.body(matchesJsonSchemaInClasspath("schemas/batch/CreateBatchResponseSchema.json"));
 		
-		ProgramBatchResponse batchResponse = response.as(ProgramBatchResponse.class);
+		CreateBatchResponse batchResponse = response.as(CreateBatchResponse.class);
 		if (batchIds.size() == 0) {
 			batchId = batchResponse.getBatchId();
 			batchName = batchResponse.getBatchName();
@@ -83,15 +85,32 @@ public class ProgramBatchStepDef extends GlobalTestData{
 		}
 	}
 
-	@Given("Admin create POST request with valid request body and no authorization")
-	public void admin_create_post_request_with_valid_request_body_and_no_authorization() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "CreateBatch_NoAuth");
-        requestSpec = given()
+	@Given("Admin create POST request with invalid input for {string} from excel sheet")
+	public void admin_create_post_request_with_invalid_input_for_from_excel_sheet(String scenario) throws IOException {
+		data = ExcelReader.readExcelData("Batch", scenario);
+		if (scenario.contains("NoAuth")) {
+			requestSpec = given()
                 .spec(RequestSpecUtil.getRequestSpecWithoutAuth())
                 .basePath(data.get("Endpoint"))
                 .body(data.get("Body")); 
+		}
+		else {
+			requestSpec = given()
+	                .spec(RequestSpecUtil.getRequestSpec())
+	                .basePath(data.get("Endpoint"))
+	                .body(data.get("Body")); 
+		}
 	}
 
+	@Given("Admin create POST request with missing additional fields")
+	public void admin_create_post_request_with_missing_additional_fields() throws IOException {
+		data = ExcelReader.readExcelData("Batch", "CreateBatch_Missing_Additional_Fields");
+		requestSpec = given()
+                .spec(RequestSpecUtil.getRequestSpec())
+                .basePath(data.get("Endpoint"))
+                .body(data.get("Body")); 
+	}
+	
 	@Given("Admin create POST request with existing batch name")
 	public void admin_create_post_request_with_existing_batch_name() throws IOException {
 		data = ExcelReader.readExcelData("Batch", "CreateBatch_Existing_Batch");
@@ -119,24 +138,62 @@ public class ProgramBatchStepDef extends GlobalTestData{
                 .body(data.get("Body")); 
 	}
 
-	@Given("Admin create POST request with missing additional fields")
-	public void admin_create_post_request_with_missing_additional_fields() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "CreateBatch_Missing_Additional_Fields");
+	
+
+	@Given("Admin create POST request with invalid batchName in request body")
+	public void admin_create_post_request_with_invalid_batch_name_in_request_body() throws IOException {
+		data = ExcelReader.readExcelData("Batch", "CreateBatch_invalid_BatchName");
 		requestSpec = given()
                 .spec(RequestSpecUtil.getRequestSpec())
                 .basePath(data.get("Endpoint"))
                 .body(data.get("Body")); 
 	}
 
-	@Given("Admin create POST request with invalid data in request body")
-	public void admin_create_post_request_with_invalid_data_in_request_body() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "CreateBatch_invalid_data");
+	@Given("Admin create POST request with invalid batchDescription in request body")
+	public void admin_create_post_request_with_invalid_batch_description_in_request_body() throws IOException {
+		data = ExcelReader.readExcelData("Batch", "CreateBatch_invalid_BatchDescription");
+		requestSpec = given()
+                .spec(RequestSpecUtil.getRequestSpec())
+                .basePath(data.get("Endpoint"))
+                .body(data.get("Body")); 
+	}
+	
+	@Given("Admin create POST request with invalid batchNoOfClasses in request body")
+	public void admin_create_post_request_with_invalid_batch_no_of_classes_in_request_body() throws IOException {
+		data = ExcelReader.readExcelData("Batch", "CreateBatch_invalid_BatchNoOfClasses");
+		requestSpec = given()
+                .spec(RequestSpecUtil.getRequestSpec())
+                .basePath(data.get("Endpoint"))
+                .body(data.get("Body")); 
+	}
+	
+	@Given("Admin create POST request with invalid batchName length in request body")
+	public void admin_create_post_request_with_invalid_batch_name_length_in_request_body() throws IOException {
+		data = ExcelReader.readExcelData("Batch", "CreateBatch_invalid_BatchNameLength");
+		requestSpec = given()
+                .spec(RequestSpecUtil.getRequestSpec())
+                .basePath(data.get("Endpoint"))
+                .body(data.get("Body")); 
+	}
+	
+	@Given("Admin create POST request with invalid batchStatus in request body")
+	public void admin_create_post_request_with_invalid_batch_status_in_request_body() throws IOException {
+		data = ExcelReader.readExcelData("Batch", "CreateBatch_invalid_BatchStatus");
 		requestSpec = given()
                 .spec(RequestSpecUtil.getRequestSpec())
                 .basePath(data.get("Endpoint"))
                 .body(data.get("Body")); 
 	}
 
+	@Given("Admin create POST request with invalid programId in request body")
+	public void admin_create_post_request_with_invalid_program_id_in_request_body() throws IOException {
+		data = ExcelReader.readExcelData("Batch", "CreateBatch_invalid_ProgramId");
+		requestSpec = given()
+                .spec(RequestSpecUtil.getRequestSpec())
+                .basePath(data.get("Endpoint"))
+                .body(data.get("Body")); 
+	}
+	
 	@Given("Admin create POST request with inactive program Id")
 	public void admin_create_post_request_with_inactive_program_id() throws IOException {
 		data = ExcelReader.readExcelData("Batch", "CreateBatch_inactive_programId");
@@ -222,31 +279,26 @@ public class ProgramBatchStepDef extends GlobalTestData{
 		Assert.assertEquals(json.getInt("batchId"), batchId, "Batch Id doesn't match");
 	}
 
-	@Given("Admin create GET request with invalid batchId")
-	public void admin_create_get_request_with_invalid_batch_id() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "GetBatchById_invalidBatchId");
-		requestSpec = given()
+	@Given("Admin create GET request by BatchId with invalid input for {string} from excel sheet")
+	public void admin_create_get_request_by_batch_id_with_invalid_input_for_from_excel_sheet(String scenario) throws IOException {
+		data = ExcelReader.readExcelData("Batch", scenario);
+		if (scenario.contains("NoAuth")) {
+			requestSpec = given()
+	                .spec(RequestSpecUtil.getRequestSpecWithoutAuth())
+	                .pathParam("batchId", batchId)
+	                .basePath(data.get("Endpoint"));
+		}
+		else if (scenario.contains("invalidBatchId")) {
+			requestSpec = given()
                 .spec(RequestSpecUtil.getRequestSpec())
-                .pathParam("batchId", "999999")
                 .basePath(data.get("Endpoint"));
-	}
-	
-	@Given("Admin create GET request to retrieve batch with invalid endpoint")
-	public void admin_create_get_request_to_retrieve_batch_with_invalid_endpoint() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "GetBatchById_Invalid_Endpoint");
-		requestSpec = given()
-                .spec(RequestSpecUtil.getRequestSpec())
-                .pathParam("batchId", batchId)
-                .basePath(data.get("Endpoint"));
-	}
-	
-	@Given("Admin create GET request to retrieve batch without authorization")
-	public void admin_create_get_request_to_retrieve_batch_without_authorization() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "GetBatchById_NoAuth");
-		requestSpec = given()
-                .spec(RequestSpecUtil.getRequestSpecWithoutAuth())
-                .pathParam("batchId", batchId)
-                .basePath(data.get("Endpoint"));
+		}
+		else {
+			requestSpec = given()
+	                .spec(RequestSpecUtil.getRequestSpec())
+	                .pathParam("batchId", batchId)
+	                .basePath(data.get("Endpoint"));
+		}
 	}
 	
 	//Get Batch By Batch Name
@@ -269,31 +321,26 @@ public class ProgramBatchStepDef extends GlobalTestData{
 		Assert.assertEquals(json.getString("batchName"), batchName, "Batch Name doesn't match");
 	}
 	
-	@Given("Admin create GET request to retrieve batch with invalid batch name")
-	public void admin_create_get_request_to_retrieve_batch_with_invalid_batch_name() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "GetBatchByName_Invalid_BatchName");
-		requestSpec = given()
+	@Given("Admin create GET request by BatchName with invalid input for {string} from excel sheet")
+	public void admin_create_get_request_by_batch_name_with_invalid_input_for_from_excel_sheet(String scenario) throws IOException {
+		data = ExcelReader.readExcelData("Batch", scenario);
+		if (scenario.contains("NoAuth")) {
+			requestSpec = given()
+	                .spec(RequestSpecUtil.getRequestSpecWithoutAuth())
+	                .pathParam("batchName", batchName)
+	                .basePath(data.get("Endpoint"));
+		}
+		else if (scenario.contains("Invalid_BatchName")) {
+			requestSpec = given()
                 .spec(RequestSpecUtil.getRequestSpec())
-                .pathParam("batchName", "SDET")
                 .basePath(data.get("Endpoint"));
-	}
-	
-	@Given("Admin create GET request to retrieve batch by batch name without auth")
-	public void admin_create_get_request_to_retrieve_batch_by_batch_name_without_auth() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "GetBatchByName_NoAuth");
-		requestSpec = given()
-                .spec(RequestSpecUtil.getRequestSpecWithoutAuth())
-                .pathParam("batchName", batchName)
-                .basePath(data.get("Endpoint"));
-	}
-	
-	@Given("Admin create GET request to retrieve batch by batch name with invalid endpoint")
-	public void admin_create_get_request_to_retrieve_batch_by_batch_name_with_invalid_endpoint() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "GetBatchByName_Invalid_Endpoint");
-		requestSpec = given()
+		}
+		else {
+			requestSpec = given()
                 .spec(RequestSpecUtil.getRequestSpec())
                 .pathParam("batchName", batchName)
                 .basePath(data.get("Endpoint"));
+		}
 	}
 	
 	//Get Batch By ProgramId
@@ -317,32 +364,123 @@ public class ProgramBatchStepDef extends GlobalTestData{
 				.body("programId", Every.everyItem(Matchers.equalTo(programId)));		
 	}
 
-	@Given("Admin create GET request to retrieve batch with invalid programId")
-	public void admin_create_get_request_to_retrieve_batch_with_invalid_program_id() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "GetBatchByProgram_Invalid_ProgramId");
-		requestSpec = given()
-                .spec(RequestSpecUtil.getRequestSpec())
-                .pathParam("programId", 100)
-                .basePath(data.get("Endpoint"));
-	}
-
-	@Given("Admin create GET request to retrieve batch by programId without auth")
-	public void admin_create_get_request_to_retrieve_batch_by_program_id_without_auth() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "GetBatchByProgram_NoAuth");
-		requestSpec = given()
-                .spec(RequestSpecUtil.getRequestSpecWithoutAuth())
-                .pathParam("programId", programId)
-                .basePath(data.get("Endpoint"));
-	}
-
-	@Given("Admin create GET request to retrieve batch by programId with invalid endpoint")
-	public void admin_create_get_request_to_retrieve_batch_by_program_id_with_invalid_endpoint() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "GetBatchByProgram_Invalid_Endpoint");
-		requestSpec = given()
+	@Given("Admin create GET request by programId with invalid input for scenario {string} from excel sheet")
+	public void admin_create_get_request_by_program_id_with_invalid_input_for_scenario_from_excel_sheet(String scenario) throws IOException {
+		data = ExcelReader.readExcelData("Batch", scenario);
+		if (scenario.contains("NoAuth")) {
+			requestSpec = given()
+	                .spec(RequestSpecUtil.getRequestSpecWithoutAuth())
+	                .pathParam("programId", programId)
+	                .basePath(data.get("Endpoint"));
+		}
+		else if (scenario.contains("Invalid_ProgramId")) {
+			requestSpec = given()
+	                .spec(RequestSpecUtil.getRequestSpec())
+	                .basePath(data.get("Endpoint"));
+		}
+		else {
+			requestSpec = given()
                 .spec(RequestSpecUtil.getRequestSpec())
                 .pathParam("programId", programId)
                 .basePath(data.get("Endpoint"));
+		}
 	}
 
+	//PUT Request to update batch
+	@Given("Admin create PUT request to update batch with valid batchId for scenario {string}")
+	public void admin_create_put_request_to_update_batch_with_valid_batch_id_for_scenario(String scenario) throws IOException {
+		data = ExcelReader.readExcelData("Batch", scenario);
+		ObjectMapper mapper = new ObjectMapper();
+        PutBatchRequest batchData = mapper.readValue(data.get("Body"), PutBatchRequest.class);
+        if (!scenario.contains("UpdateBatchName")) {
+        	batchData.setBatchName(batchName);
+        }
+        batchData.setProgramId(updateProgramId);
+        batchData.setProgramName(updateProgramName);
+		requestSpec = given()
+                .spec(RequestSpecUtil.getRequestSpec())
+                .pathParam("batchId", batchId)
+                .basePath(data.get("Endpoint"))
+                .body(batchData);
+		scenarioContext.setContext("BATCH_NAME", batchData.getBatchName());
+		scenarioContext.setContext("BATCH_STATUS", batchData.getBatchStatus());
+		scenarioContext.setContext("BATCH_NOOFCLASSES", batchData.getBatchNoOfClasses());
+	}
+
+	@When("Admin sends PUT request to update the batch")
+	public void admin_sends_put_request_to_update_the_batch() {
+		response = requestSpec.when().log().all().put();
+	}
+
+	@Then("Admin received success code with updated ProgramId in response")
+	public void admin_received_success_code_with_updated_program_id_in_response() {
+		int expectedStatusCode = Integer.parseInt(data.get("ExpectedStatusCode"));
+		response.then().log().all()
+				.statusCode(expectedStatusCode)
+				.body(matchesJsonSchemaInClasspath("schemas/batch/PutBatchByIdResponseSchema.json"));
+		
+		PutBatchResponse batchResponse = response.getBody().as(PutBatchResponse.class);
+		Assert.assertEquals(batchResponse.getProgramId(), updateProgramId);
+		Assert.assertEquals(batchResponse.getProgramName(), updateProgramName);
+	}
+	
+	@Then("Admin received success code with updated batchName in response")
+	public void admin_received_success_code_with_updated_batch_name_in_response() {
+		int expectedStatusCode = Integer.parseInt(data.get("ExpectedStatusCode"));
+		response.then().log().all()
+				.statusCode(expectedStatusCode)
+				.body(matchesJsonSchemaInClasspath("schemas/batch/PutBatchByIdResponseSchema.json"));
+		
+		PutBatchResponse batchResponse = response.getBody().as(PutBatchResponse.class);
+		batchName = (String)scenarioContext.getContext("BATCH_NAME");
+		Assert.assertEquals(batchResponse.getBatchName(), batchName);
+	}
+	
+	@Then("Admin received success code with updated batchStatus in response")
+	public void admin_received_success_code_with_updated_batch_status_in_response() {
+		int expectedStatusCode = Integer.parseInt(data.get("ExpectedStatusCode"));
+		response.then().log().all()
+				.statusCode(expectedStatusCode)
+				.body(matchesJsonSchemaInClasspath("schemas/batch/PutBatchByIdResponseSchema.json"));
+		
+		PutBatchResponse batchResponse = response.getBody().as(PutBatchResponse.class);
+		Assert.assertEquals(batchResponse.getBatchStatus(), (String)scenarioContext.getContext("BATCH_STATUS"));
+	}
+	
+	@Then("Admin received success code with updated batchNoOfClasses in response")
+	public void admin_received_success_code_with_updated_batch_no_of_classes_in_response() {
+		int expectedStatusCode = Integer.parseInt(data.get("ExpectedStatusCode"));
+		response.then().log().all()
+				.statusCode(expectedStatusCode)
+				.body(matchesJsonSchemaInClasspath("schemas/batch/PutBatchByIdResponseSchema.json"));
+		
+		PutBatchResponse batchResponse = response.getBody().as(PutBatchResponse.class);
+		Assert.assertEquals(batchResponse.getBatchNoOfClasses(), (int)scenarioContext.getContext("BATCH_NOOFCLASSES"));
+	}
+	
+	@Given("Admin create PUT request with invalid input for each {string} from excel sheet")
+	public void admin_create_put_request_with_invalid_input_for_each_from_excel_sheet(String scenario) throws IOException {
+		data = ExcelReader.readExcelData("Batch", scenario);
+		if (scenario.contains("Invalid_BatchId")) {
+			requestSpec = given()
+	                .spec(RequestSpecUtil.getRequestSpec())
+	                .basePath(data.get("Endpoint"))
+	                .body(data.get("Body"));
+		}
+		else if (scenario.contains("NoAuth")) {
+			requestSpec = given()
+	                .spec(RequestSpecUtil.getRequestSpecWithoutAuth())
+	                .pathParam("batchId", batchId)
+	                .basePath(data.get("Endpoint"))
+	                .body(data.get("Body"));
+		}
+		else {
+			requestSpec = given()
+					.spec(RequestSpecUtil.getRequestSpec())
+					.pathParam("batchId", batchId)
+					.basePath(data.get("Endpoint"))
+					.body(data.get("Body"));
+		}
+	}
 
 }

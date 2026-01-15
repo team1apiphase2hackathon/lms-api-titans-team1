@@ -1,6 +1,6 @@
 package requestPojo;
 
-public class ProgramBatchRequest {
+public class CreateBatchRequest {
 	private String batchDescription;
 	private String batchName;
 	private int batchNoOfClasses;

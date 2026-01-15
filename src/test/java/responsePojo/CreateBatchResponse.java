@@ -1,6 +1,6 @@
 package responsePojo;
 
-public class ProgramBatchResponse {
+public class CreateBatchResponse {
 	private int batchId;
 	private String batchDescription;
 	private String batchName;
