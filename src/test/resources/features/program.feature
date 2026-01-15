@@ -1,7 +1,7 @@
 Feature: Program
 
 
-
+@createProgram
   Scenario Outline: Verify if admin is able to create a Program
     Given Admin has a valid authorization token set
     When Admin sends POST request to create program with different payload for "<ScenarioName>" from dataSheet
@@ -19,11 +19,12 @@ Feature: Program
       |CreateProgram_with_Missing_MandatoryField_ProgramStatus		|
       |CreateProgram_with_Valid_ProgramDesc_ProgramName_Active_Status		|
       |CreateProgram_with_InActive_Status		|
+      |CreateProgram_with_Active_Status    |
       |CreateProgram_with_Existing_ProgramName				|
       |CreateProgram_with_Valid_ProgramDesc_ProgramName_Active_Status		|
       |CreateProgram_with_Valid_ProgramDesc_ProgramName_Active_Status		|
 
-  @programs1
+  @GetProgram
   Scenario Outline: Verify if admin is able to GET Program by ProgramId
 
     Given Admin has a valid authorization token set
@@ -36,9 +37,9 @@ Feature: Program
       |GetProgramById_with_Invalid_Method		|
       |GetProgramById_with_Invalid_ProgramId	|
       |GetProgramById_with_Valid_ProgramId		|
-  @programs1
+  @GetAll
   Scenario Outline: Verify if admin is able to GET All Programs
-
+    Given Admin has a valid authorization token set
     When Admin sends GET request to get all programs with different payload for "<ScenarioName>" from dataSheet
     Then Admin verifies the response payload with expected output from the data sheet for Get All Programs
 
@@ -48,9 +49,9 @@ Feature: Program
       |	GetPrograms_with_Invalid_Method 	|
       |	Get_All_Programs					|
 
-
+  @update
   Scenario Outline: Verify if admin is able to UPDATE a ProgramByProgramId using PUT method
-
+    Given Admin has a valid authorization token set
     When Admin sends PUT request to update programById with payload for "<ScenarioName>" using dataSheet
     Then Admin verifies the response payload with expected output from the data sheet for Update Program ByProgramId
 
@@ -58,6 +59,7 @@ Feature: Program
       |			ScenarioName				|
       |UpdateProgramById_with_Invalid_Endpoint	|
       |UpdateProgramById_with_InvalidMethod		|
+      |UpdateProgramById_with_InvalidProgramId  |
       |UpdateProgramById_with_ProgramName_LessThan_3_Characters		|
       |UpdateProgramById_with_ProgramName_LessThan_25_Characters		|
       |UpdateProgramById_with_ProgramDescription_LessThan_3_Characters		|
@@ -66,12 +68,13 @@ Feature: Program
       |UpdateProgramById_with_Missing_MandatoryField_ProgramStatus		|
       |	UpdateProgramById_ProgramID_InActive_Status				|
       |	UpdateProgramById_ProgramID_Active_Status				|
-      |UpdateProgramById_with_Valid_ProgramDesc_ProgramName_Active_Status		|
+      |	UpdateProgramById_with_existing_ProgramName				|
       |UpdateProgramById_with_SpecialCharacters				|
-      |UpdateProgramById_with_Valid_Inputs				|
+      |UpdateProgramById_with_Valid_ProgramDesc_ProgramName_Active_Status		|
 
+    @updateByName
   Scenario Outline: Verify if admin is able to UPDATE a ProgramByProgramName using PUT method
-
+    Given Admin has a valid authorization token set
     When Admin sends PUT request to update programByName with payload for "<ScenarioName>" using dataSheet
     Then Admin verifies the response payload with expected output from the data sheet for Update Program ByProgramName
 
@@ -93,13 +96,14 @@ Feature: Program
 
   Scenario Outline: Verify if admin is able to DELETE a ProgramByProgramName using DELETE method
 
-    When Admin sends DELETE request to delete programByName with payload for <"ScenarioName"> using dataSheet
+    Given Admin has a valid authorization token set
+    When Admin sends DELETE request to delete programByName with payload for "<ScenarioName>" using dataSheet
     Then Admin verifies the response payload with expected output from the data sheet for Delete Program ByProgramName
 
     Examples:
 
       |			ScenarioName				|
-      |	DeleteProgramByName_with_Invalid_BasePath	|
+      |	DeleteProgramByName_with_Invalid_EndPoint	|
       |	DeleteProgramByName_with_Invalid_Method		|
       |	DeleteProgramByName_with_Invalid_ProgramName	|
       |	DeleteProgramByName_with_valid_ProgramName	|
@@ -111,12 +115,12 @@ Feature: Program
 
     Examples:
       |			ScenarioName				|
-      |	DeleteProgramById_with_Invalid_BasePath	|
+      |	DeleteProgramById_with_Invalid_EndPoint	|
       |	DeleteProgramById_with_Invalid_Method		|
       |	DeleteProgramById_with_Invalid_ProgramName	|
       |	DeleteProgramById_with_valid_ProgramName	|
 
-
+@Token
   Scenario Outline:
   Verify if admin is able to access the endPoints without token
     Given Admin bearer token in set to empty
@@ -133,7 +137,7 @@ Feature: Program
       |	UpdateProgramByName |
       |	DeleteProgramByName	|
       |	DeleteProgramById	|
-
+@Token
   Scenario Outline:
   Verify if admin is able to access the endPoints with invalid token
     Given Admin bearer token in set to invalid
