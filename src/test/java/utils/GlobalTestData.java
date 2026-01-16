@@ -18,6 +18,7 @@ public class GlobalTestData {
 	protected static String StaffUserId;
 	protected static String StudentUserId;
 	public static String token;
+	protected static int deletedProgramId;
 
 	public GlobalTestData() {
 
