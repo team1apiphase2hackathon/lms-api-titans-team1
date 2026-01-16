@@ -275,9 +275,15 @@ Given Admin has a valid authorization token in user controller
     When Admin sends GET Request for the LMS API batchId by userId
     Then Admin receives 200 OK Status with response body
     
-    
- 
-       @delete 
+    @get
+    Scenario Outline: Verify if admin is able to get All Programs with users
+      When Admin sends GET request to get all programs with users for "<ScenarioName>" from dataSheet
+      Then Admin verifies the response payload with expected output from the data sheet for Get All Programs with Users
+ Examples:
+         | ScenarioName |
+         | GetAllProgramsWithUsers_with_Valid_Endpoint |
+
+  @delete
    Scenario: Check if admin able to delete a admin with valid admin user
     When Admin sends DELETE Request for the LMS API endpoint  and  valid admin user
     Then Admin receives 200 OK Status with response body
