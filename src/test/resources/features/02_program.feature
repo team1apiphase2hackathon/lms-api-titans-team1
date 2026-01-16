@@ -107,7 +107,7 @@ Feature: Program
       | UpdateProgramByName_to_Active_Status                                 |
       | UpdateProgramByName_with_Valid_ProgramDesc_ProgramName_Active_Status |
 
-  @Program
+  @DeleteProgram
   Scenario Outline: Verify if admin is able to DELETE a ProgramByProgramName using DELETE method
     Given Admin has a valid authorization token set
     When Admin sends DELETE request to delete programByName with payload for "<ScenarioName>" using dataSheet
