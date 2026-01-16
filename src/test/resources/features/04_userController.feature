@@ -244,12 +244,12 @@ Feature: User Controller
   @get
   Scenario: Check if admin able to retrieve user by program batchId
     When Admin sends GET Request for the LMS API user by program batchId
-    Then Admin receives 200 OK Status with response body
+    Then Admin receives 200 OK Status with batchid response body
 
   @get
   Scenario: Check if admin able to retrieve user by program
     When Admin sends GET Request for the LMS API user by program
-    Then Admin receives 200 OK Status with response body
+    Then Admin receives 200 OK Status with programid response body
 
   @get
   Scenario Outline: Check if admin able to retrieve user by roleId
