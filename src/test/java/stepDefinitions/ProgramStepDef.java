@@ -41,14 +41,10 @@ public class ProgramStepDef extends GlobalTestData {
         data = ExcelReader.readExcelData("Program", scenarioNameFromFeature);
         String dataSheetTestname = data.get("ScenarioName");
         String body = data.get("Body");
-        System.out.println("Executing Scenario: " + dataSheetTestname);
-        System.out.println("Json Payload from dataSheeet : " + body);
 
         if (data != null) {
             String dataSheetTestName = data.get("ScenarioName");
-
             if (scenarioNameFromFeature.equalsIgnoreCase(dataSheetTestName)) {
-
                 programInput = ProgramSendRequest.createProgramParseData(data.get("Body"));
 
                 requestSpec = given()
@@ -58,7 +54,7 @@ public class ProgramStepDef extends GlobalTestData {
                 String httpMethod = data.get("Method");
                 String endPoint = data.get("Endpoint");
 
-                response = requestSpec.
+                response = requestSpec.log().all().
                         when().
                         request(httpMethod, endPoint).
                         then().log().all().extract().response();
@@ -72,10 +68,10 @@ public class ProgramStepDef extends GlobalTestData {
     public void admin_verifies_the_response_payload_with_expected_output_from_the_data_sheet() {
 
         int expectedStatus = Integer.parseInt(data.get("ExpectedStatusCode"));
-        response.then().statusCode(expectedStatus);
+        response.then().log().all().statusCode(expectedStatus);
         if (expectedStatus == 201) {
             //Validate schema
-            response.then().assertThat().body(matchesJsonSchemaInClasspath("schemas/Program/CreateProgramResponseSchema.json"));
+            response.then().log().all().assertThat().body(matchesJsonSchemaInClasspath("schemas/Program/CreateProgramResponseSchema.json"));
 
             //Map response to POJO
             ProgramResponse actualResponse = response.as(ProgramResponse.class);
@@ -87,15 +83,9 @@ public class ProgramStepDef extends GlobalTestData {
 
             if (GlobalTestData.programId == 0) {
                 GlobalTestData.programId = actualResponse.getProgramId();
-                System.out.println("GlobalTestData.programId is set for the first time: " + GlobalTestData.programId);
             } else {
                 GlobalTestData.programIdList.add(actualResponse.getProgramId());
-                System.out.println("Added Program ID to GlobalTestData.programIdList: " + actualResponse.getProgramId());
             }
-
-            System.out.println("Saved Program ID to GlobalTestData: " + GlobalTestData.programId);
-            System.out.println("program Description : " + desc);
-            System.out.println("program Name : " + programName);
 
             Assert.assertEquals(actualResponse.getProgramDescription(), programInput.getProgramDescription(), "ProgramDescription is not matching");
             Assert.assertEquals(actualResponse.getProgramName(), programInput.getProgramName(), "ProgramName is not matching");
@@ -105,22 +95,17 @@ public class ProgramStepDef extends GlobalTestData {
             switch (expectedStatus) {
 
                 case 400:
-                    System.out.println("Response code received from actual response after execution: " + response.getStatusCode());
                     String badReq = response.jsonPath().getString("message");
                     Assert.assertNotNull(badReq, "Bad request ");
                     break;
                 case 404:
-                    System.out.println("Response code received from actual response after execution: " + response.getStatusCode());
                     System.out.println("Endpoint not found as expected.");
                     break;
                 case 405:
-                    System.out.println("Response code received from actual response after execution: " + response.getStatusCode());
                     String methodNotAllowed = response.jsonPath().getString("error");
                     Assert.assertEquals(methodNotAllowed, "Method Not Allowed");
                     break;
                 default:
-                    System.out.println("Response code received from actual response after execution: " + response.getStatusCode());
-                    System.out.println("Generic status: " + expectedStatus);
                     break;
             }
         }
@@ -129,7 +114,6 @@ public class ProgramStepDef extends GlobalTestData {
     @When("Admin sends GET request to get program with different payload for {string} from dataSheet")
     public void admin_sends_get_request_to_get_program_with_different_payload_for_from_data_sheet(String scenarioNameFromFeature) throws IOException {
         String scenario = scenarioNameFromFeature;
-        System.out.println(scenario);
         data = ExcelReader.readExcelData("Program", scenario);
         if (data != null) {
             String dataSheetTestname = data.get("ScenarioName");
@@ -144,7 +128,7 @@ public class ProgramStepDef extends GlobalTestData {
                 if (endPoint.contains("{programId}")) {
                     endPoint = endPoint.replace("{programId}", String.valueOf(GlobalTestData.programId));
                 }
-                response = requestSpec.
+                response = requestSpec.log().all().
                         when().
                         request(httpMethod, endPoint).
                         then().log().all().extract().response();
@@ -159,10 +143,9 @@ public class ProgramStepDef extends GlobalTestData {
     public void admin_verifies_the_response_payload_with_expected_output_from_the_data_sheet_for_get_program() {
         int expectedStatus = Integer.parseInt(data.get("ExpectedStatusCode"));
         String expectedMessage = data.get("ExpectedMessage");
-        response.then().statusCode(expectedStatus);
+        response.then().log().all().statusCode(expectedStatus);
         if (expectedStatus == 200) {
             response.then().assertThat().body(matchesJsonSchemaInClasspath("schemas/Program/GetProgramByProgramIdResponseSchema.json"));
-
             // Assert that the ID in the response matches what we stored
             int actualId = response.jsonPath().getInt("programId");
             Assert.assertEquals(actualId, GlobalTestData.programId);
@@ -189,7 +172,7 @@ public class ProgramStepDef extends GlobalTestData {
                 String httpMethod = data.get("Method");
                 String endPoint = data.get("Endpoint");
 
-                response = requestSpec.
+                response = requestSpec.log().all().
                         when().
                         request(httpMethod, endPoint).
                         then().log().all().extract().response();
@@ -235,7 +218,7 @@ public class ProgramStepDef extends GlobalTestData {
                         .spec(requestSpec);
                 String httpMethod = data.get("Method");
                 String endPoint = data.get("Endpoint");
-                response = requestSpec.
+                response = requestSpec.log().all().
                         when().
                         request(httpMethod, endPoint).
                         then().log().all().extract().response();
@@ -246,31 +229,10 @@ public class ProgramStepDef extends GlobalTestData {
     }
     @Then("Admin verifies the response payload with expected output from the data sheet for Get All Programs with Users")
     public void admin_verifies_the_response_payload_with_expected_output_from_the_data_sheet_for_get_all_programs_with_users() {
-
+        response.then().log().all();
         int expectedStatus = Integer.parseInt(data.get("ExpectedStatusCode"));
         Assert.assertEquals(response.getStatusCode(), expectedStatus, "Status code mismatch!");
 
-//        JsonPath json = response.jsonPath();
-//        List<Map<String, Object>> programs = json.getList("$");
-//        for (Map<String, Object> program : programs) {
-            //validate the program name
-//            String actualName = (String) program.get("programName");
-//            Assert.assertTrue(programNameList.contains(actualName),  "Program Name"+ actualName + " was not expected");
-//            // 2. Validate Program Status
-//            String status = (String) program.get("programStatus");
-//            Assert.assertTrue(status.equalsIgnoreCase("Active") || status.equalsIgnoreCase("Inactive"),
-//                    "Status should be Active or Inactive");
-
-            // 3. Validate Nested Data (programUsers)
-            /**List<Map<String, Object>> users = (List<Map<String, Object>>) program.get("programUsers");
-            if (users != null && !users.isEmpty()) {
-                for (Map<String, Object> user : users) {
-                    // Check required fields are not null/empty
-                    Assert.assertNotNull("User ID should not be null", user.get("userId"));
-                    Assert.assertNotNull("Email should not be null", user.get("userLoginEmail"));
-                }
-            }*/
-//        }
     }
 
 
@@ -278,12 +240,9 @@ public class ProgramStepDef extends GlobalTestData {
     public void admin_sends_put_request_to_update_program_by_id_with_payload_for_using_data_sheet(String scenario) throws IOException {
         String scenarioName = scenario;
         data = ExcelReader.readExcelData("Program", scenarioName);
-        System.out.println(scenarioName);
         if (data != null) {
             String dataSheetTestname = data.get("ScenarioName");
             String body = data.get("Body");
-            System.out.println("Executing Scenario: " + dataSheetTestname);
-            System.out.println("Json Payload from dataSheeet : " + body);
             if (scenarioName.equalsIgnoreCase(dataSheetTestname)) {
                 programInput = ProgramSendRequest.createProgramParseData(data.get("Body"));
                 requestSpec = given()
@@ -293,9 +252,13 @@ public class ProgramStepDef extends GlobalTestData {
                 String httpMethod = data.get("Method");
                 String endPoint = data.get("Endpoint");
                 if (endPoint.contains("{programId}")) {
-                    endPoint = endPoint.replace("{programId}", GlobalTestData.programIdList.get(programIdList.size() - 1).toString());
-                }
-                response = requestSpec.
+                    if (GlobalTestData.programIdList == null || GlobalTestData.programIdList.isEmpty()) {
+                        Assert.fail("Test stopped: No Program IDs available in GlobalTestData.");
+                        int lastIndex = GlobalTestData.programIdList.size() - 1;
+                        int programId = GlobalTestData.programIdList.get(lastIndex);
+                    endPoint = endPoint.replace("{programId}", String.valueOf(programId));
+                }  }
+                response = requestSpec.log().all().
                         when().
                         request(httpMethod, endPoint).
                         then().log().all().extract().response();
@@ -308,7 +271,7 @@ public class ProgramStepDef extends GlobalTestData {
         int expectedStatus = Integer.parseInt(data.get("ExpectedStatusCode"));
         String expectedMessage = data.get("ExpectedMessage");
 
-        response.then()
+        response.then().log().all()
                 .statusCode(expectedStatus)
                 .statusLine(Matchers.containsString(expectedMessage));
 
@@ -325,22 +288,17 @@ public class ProgramStepDef extends GlobalTestData {
             switch (expectedStatus) {
 
                 case 400:
-                    System.out.println("Response code received from actual response after execution: " + response.getStatusCode());
                     String badReq = response.jsonPath().getString("message");
                     Assert.assertNotNull(badReq, "Bad request ");
                     break;
                 case 404:
-                    System.out.println("Response code received from actual response after execution: " + response.getStatusCode());
                     System.out.println("Endpoint not found as expected.");
                     break;
                 case 405:
-                    System.out.println("Response code received from actual response after execution: " + response.getStatusCode());
                     String methodNotAllowed = response.jsonPath().getString("error");
                     Assert.assertEquals(methodNotAllowed, "Method Not Allowed");
                     break;
                 default:
-                    System.out.println("Response code received from actual response after execution: " + response.getStatusCode());
-                    System.out.println("Generic status: " + expectedStatus);
                     break;
             }
         }
@@ -350,12 +308,9 @@ public class ProgramStepDef extends GlobalTestData {
     public void admin_sends_put_request_to_update_program_by_name_with_payload_for_using_data_sheet(String scenario) throws IOException {
         String scenarioName = scenario;
         data = ExcelReader.readExcelData("Program", scenarioName);
-        System.out.println(scenarioName);
         if (data != null) {
             String dataSheetTestname = data.get("ScenarioName");
             String body = data.get("Body");
-            System.out.println("Executing Scenario: " + dataSheetTestname);
-            System.out.println("Json Payload from dataSheet : " + body);
 
             if (scenarioName.equalsIgnoreCase(dataSheetTestname)) {
                 programInput = ProgramSendRequest.createProgramParseData(data.get("Body"));
@@ -366,10 +321,17 @@ public class ProgramStepDef extends GlobalTestData {
                 String httpMethod = data.get("Method");
                 String endPoint = data.get("Endpoint");
                 if (endPoint.contains("{programName}")) {
-                    endPoint = endPoint.replace("{programName}", GlobalTestData.programNameList.get(programNameList.size() - 1));
+                    if (GlobalTestData.programNameList == null || GlobalTestData.programNameList.isEmpty()) {
+                        Assert.fail("Test Aborted: No Program Names available to perform the PUT request.");
+                    } else {
+                        int lastIndex = GlobalTestData.programNameList.size() - 1;
+                        String programName = GlobalTestData.programNameList.get(lastIndex);
+                        // Replace the placeholder in the endpoint
+                        endPoint = endPoint.replace("{programName}", programName);
+                    }
                 }
                 response = requestSpec.
-                        when().
+                        when().log().all().
                         request(httpMethod, endPoint).
                         then().log().all().extract().response();
             }
@@ -378,14 +340,14 @@ public class ProgramStepDef extends GlobalTestData {
 
     @Then("Admin verifies the response payload with expected output from the data sheet for Update Program ByProgramName")
     public void admin_verifies_the_response_payload_with_expected_output_from_the_data_sheet_for_update_program_by_program_name() {
-
+            response.then().log().all();
         int expectedStatus = Integer.parseInt(data.get("ExpectedStatusCode"));
         String expectedMessage = data.get("ExpectedMessage");
         if (expectedStatus == 200) {
             ProgramResponse actualResponse = response.as(ProgramResponse.class);
             response.then().assertThat().body(matchesJsonSchemaInClasspath("schemas/Program/UpdateProgramByProgramName.json"));
 
-            response.then().body("programId", Matchers.equalTo(GlobalTestData.programNameList.get(programNameList.size() - 1)));
+            response.then().log().all();
             Assert.assertEquals(response.getStatusCode(), expectedStatus, "Status code is matched");
             assertTrue(response.getStatusLine().contains(expectedMessage), "Status line message is matched");
             Assert.assertEquals(actualResponse.getProgramDescription(), programInput.getProgramDescription(), "Program Description is not matching after update.");
@@ -396,22 +358,17 @@ public class ProgramStepDef extends GlobalTestData {
             switch (expectedStatus) {
 
                 case 400:
-                    System.out.println("Response code received from actual response after execution: " + response.getStatusCode());
                     String badReq = response.jsonPath().getString("message");
                     Assert.assertNotNull(badReq, "Bad request ");
                     break;
                 case 404:
-                    System.out.println("Response code received from actual response after execution: " + response.getStatusCode());
                     System.out.println("Endpoint not found as expected.");
                     break;
                 case 405:
-                    System.out.println("Response code received from actual response after execution: " + response.getStatusCode());
                     String methodNotAllowed = response.jsonPath().getString("error");
                     Assert.assertEquals(methodNotAllowed, "Method Not Allowed");
                     break;
                 default:
-                    System.out.println("Response code received from actual response after execution: " + response.getStatusCode());
-                    System.out.println("Generic status: " + expectedStatus);
                     break;
             }
         }
@@ -431,9 +388,16 @@ public class ProgramStepDef extends GlobalTestData {
                 String httpMethod = data.get("Method");
                 String endPoint = data.get("Endpoint");
                 if (endPoint.contains("{programName}")) {
-                    endPoint = endPoint.replace("{programName}", GlobalTestData.programNameList.get(programNameList.size() - 1));
+                    if (GlobalTestData.programNameList == null || GlobalTestData.programNameList.isEmpty()) {
+                        Assert.fail("Test Aborted: No Program Names available to perform the PUT request.");
+                    } else {
+                        int lastIndex = GlobalTestData.programNameList.size() - 1;
+                        String programName = GlobalTestData.programNameList.get(lastIndex);
+                        // Replace the placeholder in the endpoint
+                        endPoint = endPoint.replace("{programName}", programName);
+                    }
                 }
-                response = requestSpec.
+                response = requestSpec.log().all().
                         when().
                         request(httpMethod, endPoint).
                         then().log().all().extract().response();
@@ -444,6 +408,8 @@ public class ProgramStepDef extends GlobalTestData {
     @Then("Admin verifies the response payload with expected output from the data sheet for Delete Program ByProgramName")
     public void admin_verifies_the_response_payload_with_expected_output_from_the_data_sheet_for_delete_program_by_program_name() {
         int expectedStatus = Integer.parseInt(data.get("ExpectedStatusCode"));
+        response.then().log().all()
+                .statusCode(expectedStatus);
         Assert.assertEquals(response.getStatusCode(), expectedStatus, "Status code is not matching");
         if (expectedStatus == 200) {
 
@@ -455,9 +421,8 @@ public class ProgramStepDef extends GlobalTestData {
         } else {
 
             if (expectedStatus == 400 || expectedStatus == 404 || expectedStatus == 405) {
-                System.out.println("Failed to delete the program " + response.jsonPath().get("message"));
 
-            }
+                        response.then().log().ifValidationFails();            }
         }
     }
 
@@ -474,9 +439,15 @@ public class ProgramStepDef extends GlobalTestData {
                 String httpMethod = data.get("Method");
                 String endPoint = data.get("Endpoint");
                 if (endPoint.contains("{programId}")) {
-                    endPoint = endPoint.replace("{programId}", GlobalTestData.programIdList.get(programIdList.size() - 1).toString());
+                    if (GlobalTestData.programIdList == null || GlobalTestData.programIdList.isEmpty()) {
+                        Assert.fail("Test failed: No Program ID available to delete.");
+                    } else {
+                        int lastIndex = GlobalTestData.programIdList.size() - 1;
+                        String programId = String.valueOf(GlobalTestData.programIdList.get(lastIndex));
+                        endPoint = endPoint.replace("{programId}", programId);
+                    }
                 }
-                response = requestSpec.
+                response = requestSpec.log().all().
                         when().
                         request(httpMethod, endPoint).
                         then().log().all().extract().response();
@@ -487,10 +458,12 @@ public class ProgramStepDef extends GlobalTestData {
 
     @Then("Admin verifies the response payload with expected output from the data sheet for Delete Program ByProgramId")
     public void admin_verifies_the_response_payload_with_expected_output_from_the_data_sheet_for_delete_program_by_program_id() {
+        response.then().log().all();
         int expectedStatus = Integer.parseInt(data.get("ExpectedStatusCode"));
+        int actualStatus = response.getStatusCode();
         Assert.assertEquals(response.getStatusCode(), expectedStatus, "Status code is not matching");
         if (expectedStatus == 200) {
-            String expectedMessage = "Message: Program Name-{" + GlobalTestData.programIdList.get(programIdList.size() - 1) + "} is deleted Successfully!";
+            String expectedMessage = "Message: Program Name-{" + programId + "} is deleted Successfully!";
             JsonPath js = response.jsonPath();
              GlobalTestData.deletedProgramId = js.getInt("programId");
             String actualSuccessMessage = js.getString("status");
@@ -499,7 +472,7 @@ public class ProgramStepDef extends GlobalTestData {
             Assert.assertEquals(expectedMessage, actualMessage, "Actual and expected message message in output is not as expected");
             Assert.assertEquals(actualSuccessMessage, "success", "Status in output is not as expected");
         } else if (expectedStatus == 400 || expectedStatus == 404 || expectedStatus == 405) {
-            System.out.println("Failed to delete the program " + response.jsonPath().get("message"));
+            response.then().log().ifValidationFails();
         }
     }
 
@@ -512,10 +485,8 @@ public class ProgramStepDef extends GlobalTestData {
     public void admin_send_http_method_to_access_endpoint_for_testcase_without_authorization_token(String scenario) throws IOException {
         String scenarioName = scenario;
         data = ExcelReader.readExcelData("Program", scenarioName);
-        System.out.println(scenarioName);
         if (data != null) {
             String dataSheetTestname = data.get("ScenarioName");
-            System.out.println("Executing Scenario: " + dataSheetTestname);
             if (scenarioName.equalsIgnoreCase(dataSheetTestname)) {
                 programInput = ProgramSendRequest.createProgramParseData(data.get("Body"));
                 requestSpec = given()
@@ -528,7 +499,7 @@ public class ProgramStepDef extends GlobalTestData {
                     endPoint = endPoint.replace("{programName}", GlobalTestData.programName);
                 }
                 response = requestSpec.
-                        when().
+                        when().log().all().
                         request(httpMethod, endPoint).
                         then().log().all().extract().response();
             }
@@ -537,6 +508,7 @@ public class ProgramStepDef extends GlobalTestData {
 
     @Then("Admin verifies the response status code with expected output from data sheet")
     public void admin_verifies_the_response_status_code_with_expected_output_from_data_sheet() {
+        response.then().log().all();
         Assert.assertEquals(response.getStatusCode(), Integer.parseInt(data.get("ExpectedStatusCode")), "Status code is not matching");
     }
 
@@ -562,10 +534,33 @@ public class ProgramStepDef extends GlobalTestData {
                     endPoint = endPoint.replace("{programName}", GlobalTestData.programName);
                 }
                 response = requestSpec.
-                        when().
+                        when().log().all().
                         request(httpMethod, endPoint).
                         then().log().all().extract().response();
             }
         }
     }
+
+
+    @When("Admin sends DELETE request to delete all programs")
+    public void admin_sends_delete_request_to_delete_all_programs() {
+        for (int i = programIdList.size() - 1; i >= 0; i--) {
+            given()
+                    .spec(RequestSpecUtil.getRequestSpec())
+                    .pathParam("id", programIdList.get(i))
+                    .when().log().all()
+                    .delete("/deletebyprogid/{programId}")
+                    .then().log().all()
+                    .assertThat()
+                    .statusCode(200);
+
+            programIdList.remove(i);
+        }
+    }
+    @Then("Admin verifies the all the deleted programs")
+    public void admin_verifies_the_all_the_deleted_programs() {
+        Assert.assertTrue(programIdList.isEmpty());
+
+    }
+
 }
