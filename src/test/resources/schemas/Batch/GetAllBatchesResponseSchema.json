@@ -12,7 +12,7 @@
           "type": "string"
         },
         "batchDescription": {
-          "type": "string"
+          "type": ["string", "null"]
         },
         "batchStatus": {
           "type": "string"
