@@ -1,3 +1,4 @@
+@Batch
 Feature: Program Batch module for LMS API 
 
 @Post
@@ -8,7 +9,7 @@ Then Admin receives created status with response body
 
 Examples:
 | batch_name | batch_description |
-| SDETTeam811 | abcd     |
+| SDETTeam1001 | abcd     |
 #| SDETTeam312 | ProgramBatchDescription12 |
 #| SDETTeam313 | TestBatchDesc  |
 
@@ -50,7 +51,7 @@ Given Admin create GET request with no authentication
 When Admin sends GET request to retrieve all batches
 Then Admin receives expected status code with error message
 
-@GetByBatchId
+@GetByBatchId 
 Scenario: Check if Admin is able to retrieve batch with valid batchId 
 Given Admin create GET request with valid batchId
 When Admin sends GET request to retrieve the batch
@@ -67,7 +68,7 @@ Examples:
 | GetBatchById_invalidBatchId |
 | GetBatchById_Invalid_Endpoint |
 
-@GetByBatchName
+@GetByBatchName 
 Scenario: Check if Admin is able to retrieve batch with valid batch name 
 Given Admin create GET request to retrieve batch with valid batch name
 When Admin sends GET request to retrieve the batch
