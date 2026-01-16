@@ -38,19 +38,17 @@ public class ProgramBatchStepDef extends GlobalTestData{
 	}
 	
 	//Create Batch
-	@Given("Admin create POST request with valid {string} format and {string}")
-	public void admin_create_post_request_with_valid_format_and(String batch_name, String batch_description) throws IOException {
-		data = ExcelReader.readExcelData("Batch", "CreateBatch_Valid_Request");
+	@Given("Admin create POST request with valid data for {string} from excel sheet")
+	public void admin_create_post_request_with_valid_data_for_from_excel_sheet(String scenario) throws IOException {
+		data = ExcelReader.readExcelData("Batch", scenario);
 		ObjectMapper mapper = new ObjectMapper();
         CreateBatchRequest batchData = mapper.readValue(data.get("Body"), CreateBatchRequest.class);
-        batchData.setBatchName(batch_name);
-        batchData.setBatchDescription(batch_description);
         batchData.setProgramId(programId);
         requestSpec = given()
                 .spec(RequestSpecUtil.getRequestSpec())
                 .basePath(data.get("Endpoint"))
                 .body(batchData);  
-        scenarioContext.setContext("BATCH_NAME", batch_name);
+        scenarioContext.setContext("BATCH_NAME", batchData.getBatchName());
 	}
 
 
@@ -487,5 +485,25 @@ public class ProgramBatchStepDef extends GlobalTestData{
 		Assert.assertEquals(batchResponse.getBatchStatus(), "Active");
 	}
 
+	@When("Admin sends DELETE request to delete all batches created")
+	public void admin_sends_delete_request_to_delete_all_batches_created() {
+	    for (int i = batchIds.size() - 1; i >= 0; i--) {
+	    	given()
+	    	.spec(RequestSpecUtil.getRequestSpec())
+            .pathParam("id", batchIds.get(i)) 
+            .when().log().all()
+            .delete("/batches/{id}") 
+            .then().log().all()
+            .assertThat()
+            .statusCode(200);
+	    	
+	    	batchIds.remove(i);
+	    }
+	}
 
+	@Then("Admin verifies all batches has been deleted")
+	public void admin_verifies_all_batches_has_been_deleted() {
+	    Assert.assertTrue(batchIds.size() == 0);
+	}
+	
 }
