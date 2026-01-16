@@ -103,106 +103,6 @@ public class ProgramBatchStepDef extends GlobalTestData{
 		}
 	}
 
-	@Given("Admin create POST request with missing additional fields")
-	public void admin_create_post_request_with_missing_additional_fields() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "CreateBatch_Missing_Additional_Fields");
-		requestSpec = given()
-                .spec(RequestSpecUtil.getRequestSpec())
-                .basePath(data.get("Endpoint"))
-                .body(data.get("Body")); 
-	}
-	
-	@Given("Admin create POST request with existing batch name")
-	public void admin_create_post_request_with_existing_batch_name() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "CreateBatch_Existing_Batch");
-		requestSpec = given()
-                .spec(RequestSpecUtil.getRequestSpec())
-                .basePath(data.get("Endpoint"))
-                .body(data.get("Body")); 
-	}
-
-	@Given("Admin create POST request with missing mandataory fields")
-	public void admin_create_post_request_with_missing_mandataory_fields() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "CreateBatch_Missing_Mandatory_Fields");
-		requestSpec = given()
-                .spec(RequestSpecUtil.getRequestSpec())
-                .basePath(data.get("Endpoint"))
-                .body(data.get("Body")); 
-	}
-
-	@Given("Admin create POST request with invalid endpoint")
-	public void admin_create_post_request_with_invalid_endpoint() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "CreateBatch_invalid_endpoint");
-		requestSpec = given()
-                .spec(RequestSpecUtil.getRequestSpec())
-                .basePath(data.get("Endpoint"))
-                .body(data.get("Body")); 
-	}
-
-	
-
-	@Given("Admin create POST request with invalid batchName in request body")
-	public void admin_create_post_request_with_invalid_batch_name_in_request_body() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "CreateBatch_invalid_BatchName");
-		requestSpec = given()
-                .spec(RequestSpecUtil.getRequestSpec())
-                .basePath(data.get("Endpoint"))
-                .body(data.get("Body")); 
-	}
-
-	@Given("Admin create POST request with invalid batchDescription in request body")
-	public void admin_create_post_request_with_invalid_batch_description_in_request_body() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "CreateBatch_invalid_BatchDescription");
-		requestSpec = given()
-                .spec(RequestSpecUtil.getRequestSpec())
-                .basePath(data.get("Endpoint"))
-                .body(data.get("Body")); 
-	}
-	
-	@Given("Admin create POST request with invalid batchNoOfClasses in request body")
-	public void admin_create_post_request_with_invalid_batch_no_of_classes_in_request_body() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "CreateBatch_invalid_BatchNoOfClasses");
-		requestSpec = given()
-                .spec(RequestSpecUtil.getRequestSpec())
-                .basePath(data.get("Endpoint"))
-                .body(data.get("Body")); 
-	}
-	
-	@Given("Admin create POST request with invalid batchName length in request body")
-	public void admin_create_post_request_with_invalid_batch_name_length_in_request_body() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "CreateBatch_invalid_BatchNameLength");
-		requestSpec = given()
-                .spec(RequestSpecUtil.getRequestSpec())
-                .basePath(data.get("Endpoint"))
-                .body(data.get("Body")); 
-	}
-	
-	@Given("Admin create POST request with invalid batchStatus in request body")
-	public void admin_create_post_request_with_invalid_batch_status_in_request_body() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "CreateBatch_invalid_BatchStatus");
-		requestSpec = given()
-                .spec(RequestSpecUtil.getRequestSpec())
-                .basePath(data.get("Endpoint"))
-                .body(data.get("Body")); 
-	}
-
-	@Given("Admin create POST request with invalid programId in request body")
-	public void admin_create_post_request_with_invalid_program_id_in_request_body() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "CreateBatch_invalid_ProgramId");
-		requestSpec = given()
-                .spec(RequestSpecUtil.getRequestSpec())
-                .basePath(data.get("Endpoint"))
-                .body(data.get("Body")); 
-	}
-	
-	@Given("Admin create POST request with inactive program Id")
-	public void admin_create_post_request_with_inactive_program_id() throws IOException {
-		data = ExcelReader.readExcelData("Batch", "CreateBatch_inactive_programId");
-		requestSpec = given()
-                .spec(RequestSpecUtil.getRequestSpec())
-                .basePath(data.get("Endpoint"))
-                .body(data.get("Body")); 
-	}
 
 	//Get ALL Batches
 	@Given("Admin create GET request with valid endpoint")
@@ -484,5 +384,108 @@ public class ProgramBatchStepDef extends GlobalTestData{
 					.body(data.get("Body"));
 		}
 	}
+	
+	@Given("Admin create DELETE request by BatchId with invalid input for scenario {string} from excel sheet")
+	public void admin_create_delete_request_by_batch_id_with_invalid_input_for_scenario_from_excel_sheet(String scenario) throws IOException {
+		data = ExcelReader.readExcelData("Batch", scenario);
+		if (scenario.contains("NoAuth")) {
+			requestSpec = given()
+	                .spec(RequestSpecUtil.getRequestSpecWithoutAuth())
+	                .pathParam("batchId", batchId)
+	                .basePath(data.get("Endpoint"));
+		}
+		else if (scenario.contains("Invalid_BatchId")) {
+			requestSpec = given()
+                .spec(RequestSpecUtil.getRequestSpec())
+                .basePath(data.get("Endpoint"));
+		}
+		else {
+			requestSpec = given()
+	                .spec(RequestSpecUtil.getRequestSpec())
+	                .pathParam("batchId", batchId)
+	                .basePath(data.get("Endpoint"));
+		}
+	}
+
+	@When("Admin sends DELETE request to delete the batch")
+	public void admin_sends_delete_request_to_delete_the_batch() {
+		response = requestSpec.when().log().all().delete();
+	}
+	
+	@Given("Admin create DELETE request with valid batchId")
+	public void admin_create_delete_request_with_valid_batch_id() throws IOException {
+		data = ExcelReader.readExcelData("Batch", "DeleteBatchById_Valid_BatchId");
+		requestSpec = given()
+                .spec(RequestSpecUtil.getRequestSpec())
+                .pathParam("batchId", batchId)
+                .basePath(data.get("Endpoint"));
+ 
+	}
+
+	@Then("Admin receives success code with deleted message")
+	public void admin_receives_success_code_with_deleted_message() {
+		
+	    Assert.assertTrue(response.asString().contains(data.get("ExpectedMessage")), "Expected message doesn't match");
+	}
+
+	@When("Admin sends GET request to retrieve deleted batch with Id")
+	public void admin_sends_get_request_to_retrieve_deleted_batch_with_id() throws IOException {
+		data = ExcelReader.readExcelData("Batch", "GetBatchById_Deleted_BatchId");
+		response = given()
+                .spec(RequestSpecUtil.getRequestSpec())
+                .pathParam("batchId", batchId)
+                .basePath(data.get("Endpoint"))
+                .when().log().all().get();
+	}
+	
+	@Then("Admin receives success code with GET response body for deleted batch")
+	public void admin_receives_success_code_with_get_response_body_for_deleted_batch() {
+		int expectedStatusCode = Integer.parseInt(data.get("ExpectedStatusCode"));
+		response.then().log().all()
+				.statusCode(expectedStatusCode);
+		JsonPath json = response.jsonPath();
+		Assert.assertEquals(json.getInt("batchId"), batchId, "Batch Id doesn't match");
+		Assert.assertEquals(json.getString("batchName"), batchName, "Batch Name doesn't match");
+		Assert.assertEquals(json.getString("batchStatus"), "Inactive");
+		
+	}
+
+	@When("Admin sends GET request to retrieve deleted batch with name")
+	public void admin_sends_get_request_to_retrieve_deleted_batch_with_name() throws IOException {
+		data = ExcelReader.readExcelData("Batch", "GetBatchByName_Deleted_BatchId");
+		response = given()
+                .spec(RequestSpecUtil.getRequestSpec())
+                .pathParam("batchName", batchName)
+                .basePath(data.get("Endpoint"))
+                .when().log().all().get();
+	}
+	
+	@When("Admin sends PUT request to update deleted batch status")
+	public void admin_sends_put_request_to_update_deleted_batch_status() throws IOException {
+		data = ExcelReader.readExcelData("Batch", "PutBatchById_Deleted_BatchId");
+		ObjectMapper mapper = new ObjectMapper();
+        PutBatchRequest batchData = mapper.readValue(data.get("Body"), PutBatchRequest.class);
+        batchData.setBatchName(batchName);
+        batchData.setProgramId(programId);
+        batchData.setProgramName(programName);
+		response = given()
+                .spec(RequestSpecUtil.getRequestSpec())
+                .pathParam("batchId", batchId)
+                .basePath(data.get("Endpoint"))
+                .body(batchData)
+                .when().log().all().put();
+	}
+
+	@Then("Admin receives success code with Active batch status in the response body")
+	public void admin_receives_success_code_with_active_batch_status_in_the_response_body() {
+		int expectedStatusCode = Integer.parseInt(data.get("ExpectedStatusCode"));
+		response.then().log().all()
+				.statusCode(expectedStatusCode)
+				.body(matchesJsonSchemaInClasspath("schemas/batch/PutBatchByIdResponseSchema.json"));
+		
+		PutBatchResponse batchResponse = response.getBody().as(PutBatchResponse.class);
+		Assert.assertEquals(batchResponse.getBatchStatus(), "Active");
+	}
+
 
 }

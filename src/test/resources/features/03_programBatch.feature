@@ -1,7 +1,7 @@
-@batch
+@Batch
 Feature: Program Batch module for LMS API 
 
-@Post @e2e
+@Post
 Scenario Outline: Check if Admin is able to create batch with valid batch name and description
 Given Admin create POST request with valid "<batch_name>" format and "<batch_description>"
 When Admin sends POST request to create program batch
@@ -9,9 +9,9 @@ Then Admin receives created status with response body
 
 Examples:
 | batch_name | batch_description |
-| SDETTeam3113 | abcd     |
-#| SDETTeam012 | ProgramBatchDescription12 |
-#| SDETTeam013 | TestBatch11  |
+| SDETTeam1001 | abcd     |
+#| SDETTeam312 | ProgramBatchDescription12 |
+#| SDETTeam313 | TestBatchDesc  |
 
 @Post
 Scenario Outline: Check if Admin is able to create batch with invalid input
@@ -33,72 +33,6 @@ Examples:
 | CreateBatch_invalid_ProgramId  |
 | CreateBatch_inactive_programId |
 
-@Post
-Scenario: Check if Admin is able to create batch with existing batch name 
-Given Admin create POST request with existing batch name
-When Admin sends POST request to create program batch
-Then Admin receives expected status code with error message
-
-@Post
-Scenario: Check if Admin is able to create batch with missing mandatary fields
-Given Admin create POST request with missing mandataory fields
-When Admin sends POST request to create program batch
-Then Admin receives expected status code with error message
-
-@Post
-Scenario: Check if Admin is able to create batch with invalid endpoint
-Given Admin create POST request with invalid endpoint
-When Admin sends POST request to create program batch
-Then Admin receives expected status code with error message
-
-@Post
-Scenario: Check if Admin is able to create batch with missing additional fields
-Given Admin create POST request with missing additional fields
-When Admin sends POST request to create program batch
-Then Admin receives created status with response body
-
-@Post
-Scenario: Check if Admin is able to create batch with invalid batchName in request body 
-Given Admin create POST request with invalid batchName in request body
-When Admin sends POST request to create program batch
-Then Admin receives expected status code with error message
-
-@Post
-Scenario: Check if Admin is able to create batch with invalid batchDescription in request body 
-Given Admin create POST request with invalid batchDescription in request body
-When Admin sends POST request to create program batch
-Then Admin receives expected status code with error message
-
-@Post
-Scenario: Check if Admin is able to create batch with invalid batchNoOfClasses in request body 
-Given Admin create POST request with invalid batchNoOfClasses in request body
-When Admin sends POST request to create program batch
-Then Admin receives expected status code with error message
-
-@Post
-Scenario: Check if Admin is able to create batch with invalid batchName length in request body 
-Given Admin create POST request with invalid batchName length in request body
-When Admin sends POST request to create program batch
-Then Admin receives expected status code with error message
-
-@Post
-Scenario: Check if Admin is able to create batch with invalid batchStatus in request body 
-Given Admin create POST request with invalid batchStatus in request body
-When Admin sends POST request to create program batch
-Then Admin receives expected status code with error message
-
-@Post
-Scenario: Check if Admin is able to create batch with invalid programId in request body 
-Given Admin create POST request with invalid programId in request body
-When Admin sends POST request to create program batch
-Then Admin receives expected status code with error message
-
-@Post
-Scenario: Check if Admin is able to create batch with inactive programId 
-Given Admin create POST request with inactive program Id
-When Admin sends POST request to create program batch
-Then Admin receives expected status code with error message
-
 @GetAll
 Scenario: Check if Admin is able to retrieve all program batches from LMS API 
 Given Admin create GET request with valid endpoint
@@ -117,7 +51,7 @@ Given Admin create GET request with no authentication
 When Admin sends GET request to retrieve all batches
 Then Admin receives expected status code with error message
 
-@GetByBatchId
+@GetByBatchId 
 Scenario: Check if Admin is able to retrieve batch with valid batchId 
 Given Admin create GET request with valid batchId
 When Admin sends GET request to retrieve the batch
@@ -134,7 +68,7 @@ Examples:
 | GetBatchById_invalidBatchId |
 | GetBatchById_Invalid_Endpoint |
 
-@GetByBatchName
+@GetByBatchName 
 Scenario: Check if Admin is able to retrieve batch with valid batch name 
 Given Admin create GET request to retrieve batch with valid batch name
 When Admin sends GET request to retrieve the batch
@@ -218,5 +152,36 @@ Examples:
 |  PutBatchById_Invalid_BatchNameLength |
 |  PutBatchById_Deleted_programId    |
 
+@DeleteBatchById
+Scenario Outline: Check if Admin is able to delete batch by batchId with invalid input 
+Given Admin create DELETE request by BatchId with invalid input for scenario "<scenario>" from excel sheet
+When Admin sends DELETE request to delete the batch
+Then Admin receives expected status code with error message
+
+Examples:
+|      scenario       |
+| DeleteBatchById_NoAuth |
+| DeleteBatchById_Invalid_Endpoint |
+| DeleteBatchById_Invalid_BatchId |
 
 
+@DeleteBatchById
+Scenario: Check if Admin is able to delete batchById with valid BatchId 
+Given Admin create DELETE request with valid batchId
+When Admin sends DELETE request to delete the batch
+Then Admin receives success code with deleted message
+
+@DeleteBatchById
+Scenario: Check if Admin is able to get batchById after batch is deleted 
+When Admin sends GET request to retrieve deleted batch with Id
+Then Admin receives success code with GET response body for deleted batch
+
+@DeleteBatchById
+Scenario: Check if Admin is able to get batchByName after batch is deleted
+When Admin sends GET request to retrieve deleted batch with name
+Then Admin receives success code with GET response body for deleted batch
+
+@DeleteBatchById
+Scenario: Check if Admin is able to update deleted batchbyId
+When Admin sends PUT request to update deleted batch status
+Then Admin receives success code with Active batch status in the response body
