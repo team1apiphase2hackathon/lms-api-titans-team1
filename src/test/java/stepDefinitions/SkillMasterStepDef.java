@@ -3,7 +3,8 @@ package stepDefinitions;
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.hamcrest.Matchers.equalTo;
 import java.util.Map;
-import http.ApiRequest;
+
+import httpRequest.ApiRequest;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;

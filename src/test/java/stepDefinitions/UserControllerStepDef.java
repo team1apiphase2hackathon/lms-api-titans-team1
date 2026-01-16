@@ -6,7 +6,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.testng.Assert;
-import http.ApiRequest;
+
+import httpRequest.ApiRequest;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
