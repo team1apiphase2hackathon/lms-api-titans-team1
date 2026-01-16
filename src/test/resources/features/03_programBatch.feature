@@ -9,7 +9,7 @@ Then Admin receives created status with response body
 
 Examples:
 | batch_name | batch_description |
-| SDETTeam1001 | abcd     |
+| SDETTeam1003 | abcd     |
 #| SDETTeam312 | ProgramBatchDescription12 |
 #| SDETTeam313 | TestBatchDesc  |
 
