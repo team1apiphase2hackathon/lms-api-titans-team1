@@ -26,7 +26,7 @@ Feature: Program
      |CreateProgram_with_Valid_ProgramDesc_ProgramName_Active_Status		|
       |CreateProgram_with_Valid_ProgramDesc_ProgramName_Active_Status		|
 
-  @Program @e2e
+  @Program
   Scenario Outline: Verify if admin is able to GET Program by ProgramId
 
     Given Admin has a valid authorization token set
@@ -40,7 +40,7 @@ Feature: Program
       |GetProgramById_with_Invalid_ProgramId	|
       |GetProgramById_with_Valid_ProgramId		|
 
-  @Program @e2e
+  @Program
   Scenario Outline: Verify if admin is able to GET All Programs
     Given Admin has a valid authorization token set
     When Admin sends GET request to get all programs with different payload for "<ScenarioName>" from dataSheet
@@ -51,7 +51,7 @@ Feature: Program
       |	GetPrograms_with_Invalid_Endpoint	|
       |	GetPrograms_with_Invalid_Method 	|
       |	Get_All_Programs					|
-  @Program @e2e
+  @Program
     Scenario Outline: Verify if admin is able to get All Programs with users
       Given Admin has a valid authorization token set
       When Admin sends GET request to get all programs with users for "<ScenarioName>" from dataSheet
@@ -63,7 +63,7 @@ Feature: Program
         |       GetPrograms_with_Invalid_Method         |
         | GetAllProgramsWithUsers_with_Valid_Endpoint |
 
-  @Program @e2e
+  @Program
   Scenario Outline: Verify if admin is able to UPDATE a ProgramByProgramId using PUT method
     Given Admin has a valid authorization token set
     When Admin sends PUT request to update programById with payload for "<ScenarioName>" using dataSheet
@@ -86,7 +86,7 @@ Feature: Program
       |UpdateProgramById_with_SpecialCharacters				|
       |UpdateProgramById_with_Valid_ProgramDesc_ProgramName_Active_Status		|
 
-  @Program @e2e
+  @Program
   Scenario Outline: Verify if admin is able to UPDATE a ProgramByProgramName using PUT method
     Given Admin has a valid authorization token set
     When Admin sends PUT request to update programByName with payload for "<ScenarioName>" using dataSheet
@@ -107,7 +107,7 @@ Feature: Program
       |	UpdateProgramByName_to_Active_Status				|
       |	UpdateProgramByName_with_Valid_ProgramDesc_ProgramName_Active_Status		|
 
-  @Program @e2e
+  @Program
   Scenario Outline: Verify if admin is able to DELETE a ProgramByProgramName using DELETE method
 
     Given Admin has a valid authorization token set
@@ -121,7 +121,7 @@ Feature: Program
       |	DeleteProgramByName_with_Invalid_Method		|
       |	DeleteProgramByName_with_Invalid_ProgramName	|
       |	DeleteProgramByName_with_valid_ProgramName	|
-  @Program @e2e
+  @Program
   Scenario Outline: Verify if admin is able to DELETE a ProgramByProgramId using DELETE method
     Given Admin has a valid authorization token set
     When Admin sends DELETE request to delete programById with payload for "<ScenarioName>" using dataSheet
@@ -134,7 +134,7 @@ Feature: Program
       |	DeleteProgramById_with_Invalid_ProgramName	|
       |	DeleteProgramById_with_valid_ProgramName	|
 
-  @Program @e2e
+  @Program
   Scenario Outline:
   Verify if admin is able to access the endPoints without token
     Given Admin bearer token in set to empty
@@ -152,7 +152,7 @@ Feature: Program
       |	UpdateProgramByName |
       |	DeleteProgramByName	|
       |	DeleteProgramById	|
-  @Program @e2e
+  @Program 
   Scenario Outline:
   Verify if admin is able to access the endPoints with invalid token
     Given Admin bearer token in set to invalid
