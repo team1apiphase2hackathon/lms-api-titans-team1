@@ -18,6 +18,27 @@ Feature: Data Clean up
       | ScenarioName                             |
       | DeleteProgramById_with_valid_ProgramName |
 
+
+
+
+
+
+
+
+
+  @Program
+  Scenario Outline: Verify if admin is able to DELETE a ProgramByProgramId using DELETE method
+    Given Admin has a valid authorization token set
+    When Admin sends DELETE request to delete all programs
+    Then Admin verifies the all the deleted programs
+
+    Examples:
+      | ScenarioName                               |
+      | DeleteProgramById_with_valid_ProgramName   |
+
+
+
+
   @Logout
   Scenario Outline: Verify Logout functionality with Auth
     Given Admin has the test data for "<ScenarioName>" from Excel with Bearer Token

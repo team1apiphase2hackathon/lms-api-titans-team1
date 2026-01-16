@@ -540,4 +540,27 @@ public class ProgramStepDef extends GlobalTestData {
             }
         }
     }
+
+
+    @When("Admin sends DELETE request to delete all programs")
+    public void admin_sends_delete_request_to_delete_all_programs() {
+        for (int i = programIdList.size() - 1; i >= 0; i--) {
+            given()
+                    .spec(RequestSpecUtil.getRequestSpec())
+                    .pathParam("id", programIdList.get(i))
+                    .when().log().all()
+                    .delete("/deletebyprogid/{programId}")
+                    .then().log().all()
+                    .assertThat()
+                    .statusCode(200);
+
+            programIdList.remove(i);
+        }
+    }
+    @Then("Admin verifies the all the deleted programs")
+    public void admin_verifies_the_all_the_deleted_programs() {
+        Assert.assertTrue(programIdList.isEmpty());
+
+    }
+
 }
