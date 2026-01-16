@@ -6,7 +6,10 @@ Feature: Data Clean up
     When Admin sends DELETE Request for the LMS API endpoint  and  valid user
     Then Admin receives 200 OK Status with response body
 
-
+ @Batch
+  Scenario: Check if Admin is able to delete batchById with valid BatchId 
+  When Admin sends DELETE request to delete all batches created
+  Then Admin verifies all batches has been deleted
 
   @Program
   Scenario Outline: Verify if admin is able to DELETE a ProgramByProgramId using DELETE method
