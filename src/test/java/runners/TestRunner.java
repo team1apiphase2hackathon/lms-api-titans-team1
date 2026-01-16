@@ -6,7 +6,7 @@ import io.cucumber.testng.CucumberOptions;
 @CucumberOptions(
         features = "src/test/resources/features",
         glue = {"stepDefinitions", "hooks"},
-   //  tags = "(@LoginModule and @e2e) or @userController or @skill",
+    // tags = "(@LoginModule and @e2e) or @programmodule",
         plugin = {
                 "pretty",
                 "html:target/cucumber-report.html",

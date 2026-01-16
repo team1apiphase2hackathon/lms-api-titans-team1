@@ -58,7 +58,7 @@ public class LoginControllerStepDef extends GlobalTestData {
 				}
 
 			}
-		} 
+		}
 	}
 
 	@Then("the response should match the expected validation message from Excel")

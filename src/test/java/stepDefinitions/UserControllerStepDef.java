@@ -258,12 +258,12 @@ public class UserControllerStepDef extends GlobalTestData {
 
 	@Then("Admin receives {int} OK Status with batchid response body")
 	public void admin_receives_ok_status_with_batchid_response_body(Integer num) {
-	response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num));
+		response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num));
 		JsonPath responseJson = response.jsonPath();
-		//user - batch validation
-		Assert.assertEquals(responseJson.getString("userId[0]"), userId,"user not linked to batchid mismatch");
+		// user - batch validation
+		Assert.assertEquals(responseJson.getString("userId[0]"), userId, "user not linked to batchid mismatch");
 	}
-	
+
 	@When("Admin sends GET Request for the LMS API user by program")
 	public void admin_sends_get_request_for_the_lms_api_user_by_program() throws Exception {
 		data = ExcelReader.readExcelData("User", "Get_User_by_Program");
@@ -275,10 +275,10 @@ public class UserControllerStepDef extends GlobalTestData {
 	public void admin_receives_ok_status_with_programid_response_body(Integer num) {
 		response.then().log().ifValidationFails().spec(ResponseSpecUtil.status(num));
 		JsonPath responseJson = response.jsonPath();
-		//user - program validation
-		Assert.assertEquals(responseJson.getString("userId[0]"), userId,"user not linked to program mismatch");
+		// user - program validation
+		Assert.assertEquals(responseJson.getString("userId[0]"), userId, "user not linked to program mismatch");
 	}
-	
+
 	@When("Admin sends GET Request for the LMS API {string}")
 	public void admin_sends_get_request_for_the_lms_api(String roleId) throws Exception {
 		data = ExcelReader.readExcelData("User", "Gets_Users_by_roleId");
